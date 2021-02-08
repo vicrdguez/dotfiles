@@ -2,6 +2,8 @@
       user-mail-address "vrodriguez@confluent.io")
 (setq ns-auto-hide-menu-bar t)
 
+(setq vic/org-dir "~/Dropbox/org/")
+
 ;; Initialize package sources
 (require 'package)
 
@@ -17,9 +19,14 @@
 
 (setq dired-listing-switches "--group-directories-first -al")
 
-(setq! deft-directory "~/vaults/org"
-       deft-extensions '("org")
-       deft-recursive t)
+;; (setq deft-directory vic/org-dir
+;;        deft-extensions '("org")
+;;        deft-recursive t)
+(use-package deft
+  :init
+  (setq deft-directory vic/org-dir)
+  (setq deft-extensions '("org"))
+  (setq deft-recursive t))
 
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 15 :weight 'semi-light)
       doom-variable-pitch-font (font-spec :family "FiraCode Nerd Font" :size 15))
@@ -32,26 +39,23 @@
 
 (use-package all-the-icons)
 
-(setq doom-theme 'doom-palenight)
+(setq doom-theme 'doom-one)
 (map! :leader
       :desc "Load new theme"
       "h t" #'counsel-load-theme)
 
+(setq org-directory vic/org-dir)
 (after! org
   ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-hide-emphasis-markers t)
+  (setq org-startup-folded 'content)
   (setq org-export-with-section-numbers nil)
-  (setq org-directory "~/vaults/org/"
+  (setq org-directory "~/Dropbox/org/"
         org-default-notes-file (expand-file-name "notes.org" org-directory)
         org-ellipsis " ▼ "
-        org-log-done 'time
-        ))
-
-;;;;;;;;;;;;;;;;;;;;
-;; Org roam config;;
-;;;;;;;;;;;;;;;;;;;;
-(setq org-roam-directory "~/vaults/org")
+        org-log-done 'time))
 (setq display-line-numbers-type t)
+(add-hook 'org-mode-hook 'turn-on-auto-fill)
 
 (after! org
   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
@@ -60,7 +64,7 @@
 
 (after! org
   (require 'org-download)
-  (setq-default org-download-image-dir "~/vaults/org/_attachments/")
+  (setq-default org-download-image-dir (concat org-directory "_attachments/"))
   (setq
         org-download-screenshot-method "screencapture -i %s"
         org-download-heading-lvl nil
@@ -80,7 +84,7 @@
 
 (after! org
   ;;(custom-set-variables '(org-agenda-files (directory-files-recursively "~/vaults/org/agenda" "\\.org$")))
-  (custom-set-variables '(org-agenda-files '("~/vaults/org/agenda")))
+  (setq org-agenda-files `(,(concat org-directory "/agenda")))
   (setq org-agenda-prefix-format '(
         (agenda . " • %i %-12:c\t%?-12t% s")
         (todo . " • %i %-12:c\t")
@@ -98,29 +102,33 @@
                                                        :scheduled today
                                                        :todo "TODAY")
                                                       (:name "Overdue" :deadline past :scheduled past :order 2)))))
+                                       (todo "" ((org-agenda-overriding-header "")
+                                                 (org-super-agenda-groups
+                                                  '((:name "Stuck projects"
+                                                     :and (:todo "PROJ"
+                                                           :not (:children ("NEXT" "READING"))))
+                                                    (:name "Projects" :todo "PROJ")
+                                                    (:name "with Subtasks"
+                                                     :and (:todo "TODO" :children todo))
+                                                    (:discard (:anything t))))))
                                        (alltodo "" ((org-agenda-overriding-header "")
                                                     (org-super-agenda-groups
                                                      '((:discard (:todo "RD"))
                                                        (:discard (:todo "TMPDROP"))
-                                                       (:name "Stuck projects"
-                                                        :and (:todo "PROJ"
-                                                              :not (:children ("NEXT" "READING")))
-                                                        :order 3)
-                                                       (:name "Next Items" :todo "NEXT" :order 4)
-                                                       (:name "Important" :priority "A" :order 5)
-                                                       (:name "Waiting and Blocked" :todo ("WAITING" "BLOCKED") :order 6)
-                                                       (:name "Projects" :todo "PROJ" :order 7)
-                                                       (:name "OKRs" :category "OKRs" :order 8)
-                                                       (:name "Books" :category "Books" :order 9)
-                                                       (:name "To Read" :todo "READ" :order 10)
+                                                       (:name "Next Items" :todo "NEXT" :order 3)
+                                                       (:name "Important" :priority "A" :order 4)
+                                                       (:name "Waiting and Blocked" :todo ("WAITING" "BLOCKED") :order 5)
+                                                       (:name "OKRs" :category "OKRs" :order 6)
+                                                       (:name "Books" :category "Books" :order 7)
+                                                       (:name "To Read" :todo "READ" :order 8)
                                                        (:name "GOALS"
                                                         :and (:todo "GOAL"
                                                               :not (:category "OKRs"))
-                                                        :order 11)
+                                                        :order 9)
                                                        (:name "Done today"
                                                         :and (:regexp "State \"DONE\""
                                                               :log t)
-                                                        :order 12)
+                                                        :order 10)
                                                        (:discard (:habit))
                                                        ))))))
                                      ("n" "Weekly view"
@@ -213,15 +221,15 @@
 
 (after! org
   (setq org-todo-keywords
-        '((sequence "PROJ(p)"
-                    "TODO(t)"
+        '((sequence "TODO(t)"
+                    "PROJ(p)"
                     "WAITING(W@/!)"
                     "BLOCKED(b@/!)"
-                    "NEXT(n)"
+                    "NEXT(n!)"
                     "|"
                     "DONE(d)"
                     "CANCELLED(c@/!)"
-                    "DELEGATED(d@/!)"
+                    "DELEGATED(D@/!)"
                     "PHONE"
                     "MEETING")
           (sequence "IDEA"
@@ -233,8 +241,8 @@
                     "READING"
                     "TMPDROP"
                     "|"
-                    "DROPPED"
-                    "FINISHED"))))
+                    "DROPPED(@/!)"
+                    "FINISHED(!)"))))
 
 (setq org-todo-state-tags-triggers
       (quote (("CANCELLED" ("CANCELLED" . t))
@@ -251,9 +259,9 @@
 
 (after! org
   ; Targets includes this file and any agenda file up tp 9 levels deep
-  (custom-set-variables '(org-refile-targets '((org-agenda-files . (:maxlevel . 3)))))
+  (custom-set-variables '(org-refile-targets '((org-agenda-files . (:maxlevel . 4)))))
   ; Targets complete directly with IDO
-  (setq org-outline-path-complete-in-steps nil) ; Refile in a single go
+  (setq org-outline-path-complete-in-steps t) ; Refile in a single go
   ; Use full outline paths for refile targets
   (setq org-refile-use-outline-path nil) ; Show full paths for refiling
   ; Allow refile to create parent task with confirmation
@@ -282,7 +290,7 @@
         org-pretty-entities t))
 
 (defun vic/get-okr-filename ()
-  (concat "~/vaults/org/agenda/OKRs/" (format-time-string "%Y.org")))
+  (concat (concat org-directory "agenda/OKRs/") (format-time-string "%Y.org")))
 
 (defun vic/get-okr-quarter()
   "THis function dinamucally gets a OKR file name"
@@ -291,16 +299,16 @@
 
 (defun vic/get-ppp-filename ()
   "This function dinamically gets a PPP file name"
-  (concat "~/vaults/org/agenda/PPPs/" (format-time-string "%Y/%b/W%V_%a-%d.org")))
+  (concat (concat org-directory "agenda/PPPs/") (format-time-string "%Y/%b/W%V_%a-%d.org")))
 
-(setq vic/inbox-path "~/vaults/org/agenda/inbox.org")
+(setq vic/inbox-path (concat org-directory "agenda/inbox.org"))
 
 (after! org
        (setq org-log-into-drawer t)
         (setq org-capture-templates
               (doct `(("Todo" :keys "t"
                        :file vic/inbox-path
-                       :template "* TODO %?\n%{time}:PROPERTIES:\n:CREATED: %U\n:Effort: %^{effort|0:05|0:15|0:30|1:00|2:00|4:00}\n:Origin: %a\n:END:\n"
+                       :template "* TODO %?\n%{time}:PROPERTIES:\n:CREATED: %U\n:Origin: %a\n:END:\n"
                        :clock-in t
                        :clock-resume t
                        :type entry
@@ -349,16 +357,15 @@
                        :clock-in t
                        :clock-resume t)
                       ("Book" :keys "b"
-                       :file "~/vaults/org/agenda/books.org"
+                       :file "~/Dropbox/org/agenda/books.org"
                        :headline "To Read"
                        :type entry
                        :template "* READ %?\n:PROPERTIES:\n:CREATED: %U\n:Origin: %a\n:END:"
                        :clock-in t
                        :clock-resume t)))))
 
-
-
 (after! org-roam
+  (setq org-roam-directory (concat org-directory "BrainForest/"))
   (setq org-roam-capture-templates
         '(("d" "default" plain #'org-roam--capture-get-point
            "%?"
@@ -368,14 +375,15 @@
             )
           )
         )
+  (setq org-roam-completion-everywhere nil)
+  (setq org-roam-link-auto-replace nil)
+  (setq org-roam-link-use-custom-faces nil)
   )
-
-(setq org-roam-completion-everywhere t)
 
 ;; Org roam
 (map! :leader
       :prefix ("r" . "roam")
-      :desc "insert" "i" #'org-roam-insert
+      ;; :desc "insert" "i" #'org-roam-insert
       :desc "Show graph" "g" #'org-roam-graph
       :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
       :desc "Org Roam Capture" "c" #'org-roam-capture
@@ -388,7 +396,7 @@
       :desc "Today" "t" #'org-roam-dailies-find-today
       :desc "Yesterday" "y" #'org-roam-dailies-find-yesterday )
       )
-
+(map! :map org-roam-mode-map :g "C-c i" #'org-roam-insert)
 ;;Org journal
 (map! :leader
       :prefix ("j" . "journal")

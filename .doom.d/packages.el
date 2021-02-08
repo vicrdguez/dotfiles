@@ -56,7 +56,8 @@
 (package! peep-dired)
 (package! all-the-icons)
 ;;(package! rainbow-delimeters)
-(package! org-roam-server)
+(package! org-roam-server
+  :recipe (:host github :repo "org-roam/org-roam-server"))
 (package! org-download)
 (package! ox-twbs)
 (package! org-super-agenda)
