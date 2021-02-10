@@ -11,7 +11,11 @@
                          ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
-(setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/xelatex"))
+(setenv "PATH" (concat
+                "/usr/local/go/bin" ";"
+                (getenv "PATH")
+                )
+        )
 (setq org-latex-pdf-process
       '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
@@ -19,17 +23,14 @@
 
 (setq dired-listing-switches "--group-directories-first -al")
 
-;; (setq deft-directory vic/org-dir
-;;        deft-extensions '("org")
-;;        deft-recursive t)
 (use-package deft
   :init
   (setq deft-directory vic/org-dir)
   (setq deft-extensions '("org"))
   (setq deft-recursive t))
 
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 15 :weight 'semi-light)
-      doom-variable-pitch-font (font-spec :family "FiraCode Nerd Font" :size 15))
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 17 :weight 'semi-light)
+      doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 17))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))

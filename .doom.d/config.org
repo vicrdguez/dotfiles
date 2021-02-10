@@ -33,7 +33,11 @@ I put some vars here that I need since the beginning of the config so there is n
 * Exporting
 Export to pdf settings
 #+begin_src elisp
-(setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/xelatex"))
+(setenv "PATH" (concat
+                "/usr/local/go/bin" ";"
+                (getenv "PATH")
+                )
+        )
 (setq org-latex-pdf-process
       '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
@@ -99,9 +103,6 @@ For me is more confortable to have the directories listed before the files. This
 * Deft
 
 #+begin_src elisp
-;; (setq deft-directory vic/org-dir
-;;        deft-extensions '("org")
-;;        deft-recursive t)
 (use-package deft
   :init
   (setq deft-directory vic/org-dir)
@@ -120,8 +121,8 @@ are the three important ones:
  They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
  font string. You generally only need these two:
 #+begin_src elisp
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 15 :weight 'semi-light)
-      doom-variable-pitch-font (font-spec :family "FiraCode Nerd Font" :size 15))
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 17 :weight 'semi-light)
+      doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 17))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
