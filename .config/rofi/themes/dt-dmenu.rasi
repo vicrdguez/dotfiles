@@ -9,12 +9,11 @@
     background-color:           #282c34;
     border-color:               #282c34;
     text-color:                 #bbc2cf;
-    height:                     20px;
-    font:                       "JetBrainsMono Nerd Font 9";
-    prompt-font:                "JetBrainsMono Nerd Font 9";
+    height:                     25px;
+    font:                       "JetBrainsMono Nerd Font 11";
     prompt-background:          #51afef;
     prompt-foreground:          #282c34;
-    prompt-padding:             2px;
+    prompt-padding:             3px;
     selected-normal-background: #ae3f3e;
     selected-normal-foreground: #ffffff;
 }
@@ -38,6 +37,8 @@
 #listview {
     layout: horizontal;
     lines: 100;
+    spacing: 5px;
+    padding: 3px;
 }
 #entry {
     padding: 2px;
@@ -45,7 +46,7 @@
     width: 10em;
 }
 #element {
-    padding: 2px 8px;
+    padding: 0px 4px;
 }
 #element selected {
     background-color: @selected-normal-background;

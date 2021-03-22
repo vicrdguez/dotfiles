@@ -64,3 +64,4 @@
 (package! org-superstar)
 (package! doct)
 (package! origami)
+(package! adoc-mode)

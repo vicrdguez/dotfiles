@@ -1,7 +1,7 @@
 Config { 
 
    -- appearance
-     font =         "xft:JetBrainsMono Nerd Font:size=13:bold:antialias=true"
+     font =         "xft:JetBrainsMono Nerd Font:size=11:bold:antialias=true"
    , additionalFonts = [ "xft:JetBrainsMono Nerd Font:pixelsize=16:antialias=true:hinting=true"]
    , bgColor =      "#282c34"
    , fgColor =      "#ff6c6b"
@@ -13,7 +13,8 @@ Config {
    , sepChar =  "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
 --   , template = "%battery% | %multicpu% | %coretemp% | %memory% | %dynnetwork% }{ %RJTT% | %date% || %kbd% "
-   , template = " %StdinReader% }{ <fc=#666666> |</fc> <fc=#b3afc2><fn=1> </fn> %uname% </fc><fc=#666666>|</fc><fc=#ecbe7b> %multicpu% </fc><fc=#666666>|</fc><fc=#ff6c6b> %memory% </fc><fc=#666666>|</fc> <fc=#51afef>%dynnetwork% </fc><fc=#666666>| %battery% |</fc><fc=#46d9ff> %date%</fc>|| %kbd% "
+   -- , template = " %StdinReader% }{ <fc=#666666> |</fc> <fc=#b3afc2><fn=1> </fn> %uname% </fc><fc=#666666>|</fc><fc=#ecbe7b> %multicpu% </fc><fc=#666666>|</fc><fc=#ff6c6b> %memory% </fc><fc=#666666>|</fc> <fc=#51afef>%dynnetwork% </fc><fc=#666666>| %battery% |</fc><fc=#46d9ff> %date%</fc>|| %kbd% "
+   , template = " %StdinReader% }{ <fc=#666666>|</fc><fc=#ecbe7b> %multicpu% </fc><fc=#666666>|</fc><fc=#ff6c6b> %memory% </fc><fc=#666666>|</fc> <fc=#51afef>%dynnetwork% </fc><fc=#666666>| %battery% |</fc><fc=#46d9ff> %date%</fc>|| %kbd% "
 
    -- general behavior
    , lowerOnStart =     True    -- send to bottom of window stack on start

@@ -14,12 +14,13 @@
 # end
 
 ### EXPORT ###
-set -U fish_user_paths $HOME/.local/bin $HOME/Applications $fish_user_paths
+#set -U fish_user_paths $HOME/.local/bin $HOME/Applications $fish_user_paths
 set fish_greeting                      # Supresses fish's intro message
 set TERM "xterm-256color"              # Sets the terminal type
 set EDITOR "emacsclient -t -a ''"      # $EDITOR use Emacs in terminal
 set VISUAL "emacsclient -c -a emacs"   # $VISUAL use Emacs in GUI mode
-
+set GOENV_ROOT "$HOME/.goenv"
+set GO_PATH "usr/local/go"
 ### SET EITHER DEFAULT EMACS MODE OR VI MODE ###
 function fish_user_key_bindings
   # fish_default_key_bindings
@@ -41,3 +42,7 @@ colorscript random
 
 # Start the Starsship prompt
 starship init fish | source
+## Starts goenv 
+source (goenv init - | psub)
+##source (jenv init - | psub)
+status --is-interactive; and jenv init - fish | source

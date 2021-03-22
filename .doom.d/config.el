@@ -2,6 +2,9 @@
       user-mail-address "vrodriguez@confluent.io")
 (setq ns-auto-hide-menu-bar t)
 
+;; Makes sure that weekdays in the timestamps of org-mode files and the agenda appear in English
+(setq system-time-locale "C")
+
 (setq vic/org-dir "~/Dropbox/org/")
 
 ;; Initialize package sources
@@ -29,7 +32,7 @@
   (setq deft-extensions '("org"))
   (setq deft-recursive t))
 
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 17 :weight 'semi-light)
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 19 :weight 'semi-light)
       doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 17))
 (after! doom-themes
   (setq doom-themes-enable-bold t
@@ -67,7 +70,9 @@
   (require 'org-download)
   (setq-default org-download-image-dir (concat org-directory "_attachments/"))
   (setq
-        org-download-screenshot-method "screencapture -i %s"
+        ;org-download-screenshot-method "screencapture -i %s"
+        ;org-download-screenshot-method "scrot -s %s"
+        org-download-screenshot-method "import %s"
         org-download-heading-lvl nil
         org-download-method 'directory)
   (org-download-enable))
@@ -343,12 +348,12 @@
                       ("Feed BrainForest" :keys "f"
                        :file vic/inbox-path
                        :type entry
-                       :template "* TODO Keep feeding [[%F][%f]] note \t:BrainForest:\n:PROPERTIES:\n:CREATED: %U\n:Origin: %a\n:END:\n"
+                       :template "* TODO Feed/extract [[%F][%f]] note about %^{topic} \t:BrainForest:\n:PROPERTIES:\n:CREATED: %U\n:Origin: %a\n:END:\n"
                        :immediate-finish t)
                       ("Meeting" :keys "m"
                        :file vic/inbox-path
                        :type entry
-                       :template "* MEETING with %^{person}\t:MEETING:\n:PROPERTIES:\n:CREATED: %U\n:Origin: %a\n:END:\n\n%?"
+                       :template "* MEETING %^{title}\t:MEETING:\n:PROPERTIES:\n:CREATED: %U\n:Origin: %a\n:END:\n\n%?"
                        :clock-in t
                        :clock-resume t)
                       ("Phone call" :keys "c"
@@ -376,6 +381,30 @@
             )
           )
         )
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry
+           #'org-roam-capture--get-point
+           "* %?"
+           :file-name "daily/%<%Y-%m-%d>"
+           :head "#+title: %<%Y-%m-%d>\n\n")
+          ("m" "Morning entry" entry
+           #'org-roam-capture--get-point
+           "* %<%H:%M>\n%?"
+           :file-name "daily/%<%Y-%m-%d>"
+           :head "#+title: %<%Y-%m-%d>\n\n"
+           :olp ("Journal" "Morning entry"))
+          ("n" "Night entry" entry
+           #'org-roam-capture--get-point
+           "* %<%H:%M>\n%?"
+           :file-name "daily/%<%Y-%m-%d>"
+           :head "#+title: %<%Y-%m-%d>\n\n"
+           :olp ("Journal" "Night entry"))
+          ("i" "Idea entry" entry
+           #'org-roam-capture--get-point
+           "* %?"
+           :file-name "daily/%<%Y-%m-%d>"
+           :head "#+title: %<%Y-%m-%d>\n\n"
+           :olp ("Ideas"))))
   (setq org-roam-completion-everywhere nil)
   (setq org-roam-link-auto-replace nil)
   (setq org-roam-link-use-custom-faces nil)
@@ -389,13 +418,19 @@
       :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
       :desc "Org Roam Capture" "c" #'org-roam-capture
       :desc "Org Roam" "r" #'org-roam
-      :desc "Find file" "f" #'org-roam-insert
+      :desc "Find file" "f" #'org-roam-find-file
       :desc "Insert (skipping capture)" "I" #'org-roam-insert-immediate
-      (:prefix ("d" . "By date")
+      :desc "Capture in today's daily" "C" #'org-roam-dailies-capture-today
+      (:prefix ("d" . "Open By date")
       :desc "Arbitrary date" "d" #'org-roam-dailies-find-date
       :desc "Tomorrow" "m" #'org-roam-dailies-find-tomorrow
       :desc "Today" "t" #'org-roam-dailies-find-today
       :desc "Yesterday" "y" #'org-roam-dailies-find-yesterday )
+      ;; (:prefix ("j" . "Org Roam dailies capture")
+      ;; :desc "Arbitrary date" "d" #'org-roam-dailies-capture-date
+      ;; :desc "Tomorrow" "m" #'org-roam-dailies-capture-tomorrow
+      ;; :desc "Today" "t" #'org-roam-dailies-capture-today
+      ;; :desc "Yesterday" "y" #'org-roam-dailies-capture-yesterday )
       )
 (map! :map org-roam-mode-map :g "C-c i" #'org-roam-insert)
 ;;Org journal

@@ -10,6 +10,9 @@ import XMonad.Layout.LayoutModifier
 import XMonad.Layout.Spacing
 import XMonad.Hooks.FadeInactive
 import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.SetWMName
+import XMonad.Hooks.EwmhDesktops
+import XMonad.Config.Xfce
 -- Layouts modifiers
 import XMonad.Layout.LimitWindows (limitWindows, increaseLimit, decreaseLimit)
 import XMonad.Layout.MultiToggle.Instances  (StdTransformers(NBFULL, MIRROR, NOBORDERS))
@@ -82,7 +85,7 @@ myFocusedBorderColor = "#ff0000"
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
   -- Xmonad
-    [ ((modm .|. shiftMask, xK_q     ), io (exitWith ExitSuccess)) -- Quit xmonad
+    [ ((modm .|. shiftMask, xK_q     ), spawn "xfce4-session-logout") -- Log out menu
     , ((modm              , xK_q     ), spawn "xmonad --recompile; xmonad --restart") -- Restart xmonad
 
 
@@ -209,7 +212,7 @@ mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 myLayout = avoidStruts(tiled ||| Mirror tiled ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
-     tiled   = mySpacing 5 $ Tall nmaster delta ratio
+     tiled   = mySpacing 3 $ Tall nmaster delta ratio
 
      -- The default number of windows in the master pane
      nmaster = 1
@@ -250,7 +253,8 @@ myManageHook = composeAll
 -- return (All True) if the default handler is to be run afterwards. To
 -- combine event hooks use mappend or mconcat from Data.Monoid.
 --
-myEventHook = mempty
+--myEventHook = mempty
+myEventHook = ewmhDesktopsEventHook
 
 ------------------------------------------------------------------------
 -- Status bars and logging
@@ -271,6 +275,7 @@ myLogHook = fadeInactiveLogHook fadeAmount
 --
 -- By default, do nothing.
 myStartupHook = do
+    setWMName "LG3D"
     spawnOnce "nitrogen --restore &"
     spawnOnce "picom &" 
 
