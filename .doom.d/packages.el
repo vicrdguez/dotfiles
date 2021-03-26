@@ -65,3 +65,5 @@
 (package! doct)
 (package! origami)
 (package! adoc-mode)
+(package! quelpa)
+(package! quelpa-use-package)

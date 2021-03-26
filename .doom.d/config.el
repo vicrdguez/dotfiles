@@ -14,6 +14,12 @@
                          ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
+(quelpa
+ '(quelpa-use-package
+   :fetcher git
+   :url "https://github.com/quelpa/quelpa-use-package.git"))
+(require 'quelpa-use-package)
+
 (setenv "PATH" (concat
                 "/usr/local/go/bin" ";"
                 (getenv "PATH")
@@ -72,7 +78,8 @@
   (setq
         ;org-download-screenshot-method "screencapture -i %s"
         ;org-download-screenshot-method "scrot -s %s"
-        org-download-screenshot-method "import %s"
+        ;org-download-screenshot-method "import %s"
+        org-download-screenshot-method "flameshot gui --raw > %s"
         org-download-heading-lvl nil
         org-download-method 'directory)
   (org-download-enable))
@@ -336,7 +343,7 @@
                       ("PPP" :keys "p"
                        :file vic/get-ppp-filename
                        :type plain
-                       :template "%(format-time-string \"#+TITLE: PPP Week %V - %B, %d %Y\")\n\n* Progress\n** %?\n* Plans\n* Problems\n"
+                       :template "%(format-time-string \"#+TITLE: PPP Week %V - %B, %d %Y\")\n\n* Victor PPPs\n- Progress\n- %?\n- Plans\n- Problems\n"
                        :clock-in t
                        :clock-resume t)
                       ("Note" :keys "n"
@@ -409,6 +416,29 @@
   (setq org-roam-link-auto-replace nil)
   (setq org-roam-link-use-custom-faces nil)
   )
+
+(use-package lister
+  :quelpa (lister :fetcher github
+                  :repo "https://github.com/publicimageltd/lister"))
+
+(use-package delve
+  :quelpa (delve :fetcher github
+                 :repo "https://github.com/publicimageltd/delve")
+  :config
+  (set-evil-initial-state! 'delve-mode 'insert)
+  (map! :map delve-mode-map
+        :n "gr"      #'delve-refresh-buffer
+        :n "l" #'delve-expand-insert-tolinks
+        :n "h"  #'devle-expand-insert-backlinks
+        :localleader
+        "RET"  #'lister-key-action
+        "TAB"  #'delve-expand-toggle-sublist)
+  (use-package! delve-minor-mode
+    :hook (org-roam-mode . delve-minor-mode-maybe-activate))
+  (use-package delve-minor-mode
+            :config
+            (add-hook 'org-mode-hook #'delve-minor-mode-maybe-activate))
+  :bind (("<f12>" . delve-open-or-select)))
 
 ;; Org roam
 (map! :leader

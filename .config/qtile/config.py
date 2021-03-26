@@ -231,7 +231,7 @@ prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 ##### Default widget Settings #####
 widget_defaults = dict(
     font='sans',
-    fontsize=12,
+    fontsize=15,
     padding=3,
 #    background=colors[2]
 )
@@ -336,12 +336,16 @@ def init_widgets_list():
                        background = colors[4],
                        fontsize = 14
                        ),
-              widget.CheckUpdates(
-                       update_interval = 1800,
-                       distro = "Arch_checkupdates",
-                       display_format = "{updates} Updates",
+#              widget.CheckUpdates(
+#                       update_interval = 1800,
+#                       distro = "Arch_checkupdates",
+#                       display_format = "{updates} Updates",
+#                       foreground = colors[2],
+#                       mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn(terminal + ' -e sudo pacman -Syu')},
+#                       background = colors[4]
+#                       ),
+              widget.Battery(
                        foreground = colors[2],
-                       mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn(terminal + ' -e sudo pacman -Syu')},
                        background = colors[4]
                        ),
               widget.TextBox(
@@ -469,7 +473,7 @@ screens = [
     Screen(
         top=bar.Bar(
             init_widgets_list(),
-            38,
+            34,
         ),
     ),
     Screen(
@@ -508,7 +512,7 @@ floating_layout = layout.Floating(float_rules=[
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 
-@hook.subscribe.startup
+@hook.subscribe.startup_once
 def start_once():
     home = os.path.expanduser('~')
     subprocess.call([home + '/.config/qtile/autostart.sh'])
