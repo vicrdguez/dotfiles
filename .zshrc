@@ -99,7 +99,7 @@ path+="$GO_PATH/bin"
 export PATH
 
 ### Alias
-alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
+alias dots='/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 #### TaskWarrior
 alias t="task"
 alias tl="task list"

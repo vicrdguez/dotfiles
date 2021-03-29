@@ -49,10 +49,13 @@
 
 (use-package all-the-icons)
 
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-material)
 (map! :leader
       :desc "Load new theme"
       "h t" #'counsel-load-theme)
+;transparent adjustment
+ (set-frame-parameter (selected-frame)'alpha '(95 . 95))
+ (add-to-list 'default-frame-alist'(alpha . (95 . 95)))
 
 (setq org-directory vic/org-dir)
 (after! org

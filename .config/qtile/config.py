@@ -24,7 +24,8 @@ keys = [
         desc="Kill focused window"
         ),
     Key([mod, "shift"], "Return",
-        lazy.spawn("rofi -show drun -config ~/.config/rofi/themes/dt-dmenu.rasi -display-drun \"Run: \" -drun-display-format \"{name}\""),
+        #lazy.spawn("rofi -show drun -config ~/.config/rofi/themes/dt-dmenu.rasi -display-drun \"Run: \" -drun-display-format \"{name}\""),
+        lazy.spawn("rofi -show drun -drun-display-format \"{name}\""),
         desc="Move window to the left"
         ),
     Key([mod], "Tab",
@@ -196,7 +197,7 @@ for i in groups:
 
 layout_theme = {"border_width": 2,
                 "margin": 8,
-                "border_focus": "e1acff",
+                "border_focus": "2eb398",
                 "border_normal": "1D2330"
                 }
 
@@ -217,14 +218,15 @@ layouts = [
     # layout.Zoomy(),
 ]
 
-colors = [["#282c34", "#282c34"], # panel background
+colors = [["#121e25", "#121e25"], # panel background
           ["#3d3f4b", "#434758"], # background for current screen tab
-          ["#ffffff", "#ffffff"], # font color for group names
+          ["#ddccbb", "#ddccbb"], # font color for group names
           ["#ff5555", "#ff5555"], # border line color for current tab
-          ["#74438f", "#74438f"], # border line color for 'other tabs' and color for 'odd widgets'
+          ["#192933", "#192933"], # border line color for 'other tabs' and color for 'odd widgets'
           ["#4f76c7", "#4f76c7"], # color for the 'even widgets'
-          ["#e1acff", "#e1acff"], # window name
-          ["#ecbbfb", "#ecbbfb"]] # backbround for inactive screens
+          ["#2eb398", "#2eb398"], # window name
+          #["#e1acff", "#e1acff"], # window name
+          ["#1f7a68", "#1f7a68"]] # backbround for inactive screens
 
 prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 
@@ -264,13 +266,13 @@ def init_widgets_list():
                        foreground = colors[2],
                        background = colors[0]
                        ),
-              widget.Prompt(
-                       prompt = prompt,
-                       font = myfont,
-                       padding = 10,
-                       foreground = colors[3],
-                       background = colors[1]
-                       ),
+              # widget.Prompt(
+              #          prompt = prompt,
+              #          font = myfont,
+              #          padding = 10,
+              #          foreground = colors[3],
+              #          background = colors[1]
+              #          ),
               widget.Sep(
                        linewidth = 0,
                        padding = 40,
@@ -278,7 +280,7 @@ def init_widgets_list():
                        background = colors[0]
                        ),
               widget.WindowName(
-                       foreground = colors[6],
+                       foreground = colors[2],
                        background = colors[0],
                        padding = 0
                        ),
@@ -291,20 +293,6 @@ def init_widgets_list():
               widget.TextBox(
                        text = '',
                        background = colors[0],
-                       foreground = colors[4],
-                       padding = 0,
-                       fontsize = 70
-                       ),
-             widget.Net(
-                       interface = "wlp0s20f3",
-                       format = '{down} ↓↑ {up}',
-                       foreground = colors[2],
-                       background = colors[4],
-                       padding = 5
-                       ),
-              widget.TextBox(
-                       text = '',
-                       background = colors[4],
                        foreground = colors[5],
                        padding = 0,
                        fontsize = 70
@@ -323,30 +311,18 @@ def init_widgets_list():
                        padding = 5
                        ),
               widget.TextBox(
-                       text='',
+                       text = '',
                        background = colors[5],
                        foreground = colors[4],
                        padding = 0,
                        fontsize = 70
                        ),
-              widget.TextBox(
-                       text = " ⟳",
-                       padding = 2,
+             widget.Net(
+                       interface = "wlp0s20f3",
+                       format = '{down} ↓↑ {up}',
                        foreground = colors[2],
                        background = colors[4],
-                       fontsize = 14
-                       ),
-#              widget.CheckUpdates(
-#                       update_interval = 1800,
-#                       distro = "Arch_checkupdates",
-#                       display_format = "{updates} Updates",
-#                       foreground = colors[2],
-#                       mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn(terminal + ' -e sudo pacman -Syu')},
-#                       background = colors[4]
-#                       ),
-              widget.Battery(
-                       foreground = colors[2],
-                       background = colors[4]
+                       padding = 5
                        ),
               widget.TextBox(
                        text = '',
@@ -369,25 +345,6 @@ def init_widgets_list():
                        mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn(terminal + ' -e htop')},
                        padding = 5
                        ),
-#              widget.TextBox(
-#                       text='',
-#                       background = colors[5],
-#                       foreground = colors[4],
-#                       padding = 0,
-#                       fontsize = 70
-#                       ),
-#              widget.TextBox(
-#                       text = " ₿",
-#                       padding = 0,
-#                       foreground = colors[2],
-#                       background = colors[4],
-#                       fontsize = 12
-#                       ),
-#              widget.BitcoinTicker(
-#                       foreground = colors[2],
-#                       background = colors[4],
-#                       padding = 5
-#                       ),
               widget.TextBox(
                        text = '',
                        background = colors[5],

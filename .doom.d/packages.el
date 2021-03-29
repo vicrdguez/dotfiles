@@ -67,3 +67,4 @@
 (package! adoc-mode)
 (package! quelpa)
 (package! quelpa-use-package)
+(package! rainbow-mode)
