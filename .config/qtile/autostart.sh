@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+lxsession &
 picom --experimental-backends --config ./picom.conf &
 #nitrogen --restore &
 xfce4-power-manager &
