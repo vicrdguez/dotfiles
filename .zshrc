@@ -90,6 +90,7 @@ export CCLOUD_API_SECRET=pvFbcR5r3PY0CbfaSI9/VZzZfif5+90JQvig+JRa56unWJX9kTDWlVB
 export CCLOUD_CLUSTER=lkc-q63p2
 export TS_TOPICS=/home/vrodriguez/source/repos/toolstation-demo/src/main/resources/topics.properties
 export TS_CFG=/home/vrodriguez/source/repos/toolstation-demo/src/main/resources/cloud.properties
+export BW_SESSION="FlOQ2RE51dpTntOB4QTRYF9vhgXDx3aLxGc5Rt30Gj0Qm4IDhvMxxI2s31C4l29FGzRRwLIrZNo32fSUcHXTgg=="
 #### PATH
 path+="$HOME/.emacs.d/bin"
 path+="$HOME/.jenv/bin"

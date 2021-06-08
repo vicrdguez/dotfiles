@@ -4,15 +4,40 @@ import subprocess
 
 from typing import List  # noqa: F401
 
-from libqtile import bar, layout, widget, hook
+from libqtile import bar, layout, widget, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
-
+from libqtile.log_utils import logger
 
 mod = "mod4"
 terminal = guess_terminal()
 myfont = "JetBrainsMono Nerd Font"
+
+def current_screen_index():
+    #print(str(qtile.screens.index(qtile.current_screen)))
+    logger.warning(qtile.current_screen)
+    return str(qtile.screens.index(qtile.current_screen))
+
+def show_keys():
+    key_help = ""
+    for k in keys:
+        mods = ""
+
+        for m in k.modifiers:
+            if m == "mod4":
+                mods += "Super + "
+            else:
+                mods += m.capitalize() + " + "
+
+        if len(k.key) > 1:
+            mods += k.key.capitalize()
+        else:
+            mods += k.key
+
+        key_help += "{:<30} {}".format(mods, k.desc + "\n")
+
+    return key_help
 
 keys = [
     # Essentials
@@ -26,8 +51,9 @@ keys = [
         ),
     Key([mod, "shift"], "Return",
         #lazy.spawn("rofi -show drun -config ~/.config/rofi/themes/dt-dmenu.rasi -display-drun \"Run: \" -drun-display-format \"{name}\""),
-        lazy.spawn("rofi -show drun -drun-display-format \"{name}\""),
-        desc="Move window to the left"
+        lazy.spawn("rofi -show drun -monitor -1"),
+        #lazy.spawn("rofi -show combi"),
+        desc="Open rofi"
         ),
     Key([mod], "Tab",
         lazy.next_layout(),
@@ -167,7 +193,18 @@ keys = [
     Key([], "XF86MonBrightnessDown",
             lazy.spawn("xbacklight -10")
             ),
+    Key([mod], "p",
+        lazy.spawn("bwmenu"), #Bitwarden with rofi
+        desc = "Bitwarden in rofi"
+        ),
 ]
+
+keys.extend([
+    Key([mod], "F1",
+        lazy.spawn("sh -c 'echo \"" + show_keys() + "\" | rofi -dmenu -i -mesg \"Keyboard shortcuts\"'"),
+        desc="Print keyboard bindings"
+        ),
+])
 
 #groups = [Group(i) for i in "123456789"]
 groups = [
@@ -441,6 +478,16 @@ screens = [
         ),
     ),
 ]
+
+
+# keys.extend([
+#     Key([mod, "shift"], "Return",
+#         #lazy.spawn("rofi -show drun -config ~/.config/rofi/themes/dt-dmenu.rasi -display-drun \"Run: \" -drun-display-format \"{name}\""),
+#         lazy.spawn("rofi -show drun -monitor " + current_screen_index()),
+#         #lazy.spawn("rofi -show combi"),
+#         desc="Open rofi"
+#         ),
+# ])
 
 # Drag floating layouts.
 mouse = [

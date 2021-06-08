@@ -5,7 +5,7 @@
 ;; Makes sure that weekdays in the timestamps of org-mode files and the agenda appear in English
 (setq system-time-locale "C")
 
-(setq vic/org-dir "~/Dropbox/org/")
+(setq vic/org-dir "~/source/BrainForest/")
 
 ;; Initialize package sources
 (require 'package)
@@ -61,14 +61,14 @@
 (after! org
   ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-hide-emphasis-markers t)
-  (setq org-startup-folded 'content)
+  (setq org-startup-folded 'content
+        org-startup-with-inline-images t)
   (setq org-export-with-section-numbers nil)
-  (setq org-directory "~/Dropbox/org/"
-        org-default-notes-file (expand-file-name "notes.org" org-directory)
-        org-ellipsis " ▼ "
+  (setq org-ellipsis " ▼ "
         org-log-done 'time))
 (setq display-line-numbers-type t)
 (add-hook 'org-mode-hook 'turn-on-auto-fill)
+(add-hook 'org-mode-hook 'org-appear-mode)
 
 (after! org
   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
@@ -380,45 +380,75 @@
                        :clock-in t
                        :clock-resume t)))))
 
-(after! org-roam
-  (setq org-roam-directory (concat org-directory "BrainForest/"))
-  (setq org-roam-capture-templates
-        '(("d" "default" plain #'org-roam--capture-get-point
-           "%?"
-           :file-name "%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n#+CATEGORY: ${title}\n#+roam_tags: seedBox"
-           :unnarrowed t
-            )
-          )
+;; V2
+(use-package! org-roam
+  :after org
+  :init
+
+  (map! :leader
+        :prefix ("r" . "roam")
+        ;; :desc "insert" "i" #'org-roam-insert
+        :desc "Show graph" "g" #'org-roam-graph
+        :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
+        :desc "Org Roam Capture" "c" #'org-roam-capture
+        :desc "Org Roam" "r" #'org-roam-buffer-toggle
+        :desc "Find node" "f" #'dendroam-node-find-initial-input
+        :desc "Insert (skipping capture)" "I" #'org-roam-insert-immediate
+        :desc "Capture in today's daily" "C" #'org-roam-dailies-capture-today
+        (:prefix ("d" . "Open By date")
+         :desc "Arbitrary date" "d" #'org-roam-dailies-find-date
+         :desc "Tomorrow" "m" #'org-roam-dailies-find-tomorrow
+         :desc "Today" "t" #'org-roam-dailies-find-today
+         :desc "Yesterday" "y" #'org-roam-dailies-find-yesterday )
+        ;; (:prefix ("j" . "Org Roam dailies capture")
+        ;; :desc "Arbitrary date" "d" #'org-roam-dailies-capture-date
+        ;; :desc "Tomorrow" "m" #'org-roam-dailies-capture-tomorrow
+        ;; :desc "Today" "t" #'org-roam-dailies-capture-today
+        ;; :desc "Yesterday" "y" #'org-roam-dailies-capture-yesterday )
         )
+  ;; (map! :map org-roam-mode-map
+  ;;       :g "C-c i" 'org-roam-node-insert)
+  (global-set-key (kbd "C-c i") #'org-roam-node-insert)
+  ;; (define-key map (kbd "C-c i") 'org-roam-node-insert)
+  (setq org-roam-directory (concat org-directory "notes/")
+        org-roam-node-display-template "${hierarchy}:${title}"
+        org-roam-db-gc-threshold most-positive-fixnum
+        ;; org-roam-title-to-slug-function #'vic/org-roam-title-input-to-slug
+        org-id-link-to-org-use-id t)
+  (add-to-list 'display-buffer-alist
+               '(("^\\*org-roam\\*"
+                  (display-buffer-in-direction)
+                  (direction . right)
+                  (window-width . 0.33)
+                  (window-height . fit-window-to-buffer))))
+  :config
+  (setq org-roam-mode-sections
+        (list #'org-roam-backlinks-section
+              #'org-roam-reflinks-section
+              ;;#'org-roam-unlinked-references-insert-section
+              ))
+  (org-roam-setup)
+  ;;(load! "dendroam")
+  (setq org-roam-capture-templates
+        '(("d" "default" plain
+           "%?"
+           :if-new (file+head "${slug}.org"
+                              "#+title: ${hierarchy-title}\n")
+           :immediate-finish t
+           :unnarrowed t)))
+  (setq org-roam-capture-ref-templates
+        '(("r" "ref" plain
+           "%?"
+           :if-new (file+head "${slug}.org"
+                              "#+title: ${title}\n")
+           :unnarrowed t)))
   (setq org-roam-dailies-capture-templates
         '(("d" "default" entry
-           #'org-roam-capture--get-point
            "* %?"
-           :file-name "daily/%<%Y-%m-%d>"
-           :head "#+title: %<%Y-%m-%d>\n\n")
-          ("m" "Morning entry" entry
-           #'org-roam-capture--get-point
-           "* %<%H:%M>\n%?"
-           :file-name "daily/%<%Y-%m-%d>"
-           :head "#+title: %<%Y-%m-%d>\n\n"
-           :olp ("Journal" "Morning entry"))
-          ("n" "Night entry" entry
-           #'org-roam-capture--get-point
-           "* %<%H:%M>\n%?"
-           :file-name "daily/%<%Y-%m-%d>"
-           :head "#+title: %<%Y-%m-%d>\n\n"
-           :olp ("Journal" "Night entry"))
-          ("i" "Idea entry" entry
-           #'org-roam-capture--get-point
-           "* %?"
-           :file-name "daily/%<%Y-%m-%d>"
-           :head "#+title: %<%Y-%m-%d>\n\n"
-           :olp ("Ideas"))))
-  (setq org-roam-completion-everywhere nil)
-  (setq org-roam-link-auto-replace nil)
-  (setq org-roam-link-use-custom-faces nil)
-  )
+           :if-new (file+head "journal.daily.%<%Y.%m.%d>.org"
+                              "#+title: %<%Y-%m-%d>\n"))))
+
+  (set-company-backend! 'org-mode '(company-capf)))
 
 (use-package lister
   :quelpa (lister :fetcher github
@@ -443,29 +473,222 @@
             (add-hook 'org-mode-hook #'delve-minor-mode-maybe-activate))
   :bind (("<f12>" . delve-open-or-select)))
 
+(use-package! dendroam
+  :after org
+  :config
+  (setq dendroam-capture-templates
+        '(("o" "OKRs" entry
+           "* %?"
+           :if-new (file+head "journal.okr.%<%Y.%m.%d>.org"
+                              "#+title: %<%Y-%m-%d>\n"))
+          ("p" "PPP" entry
+           "* %?"
+           :if-new (file+head "journal.ppp.%<%Y.%m.%V>.org"
+                              "#+title: %<%Y-%m-%d>\n"))
+          ("t" "Time note" entry
+           "* %?"
+           :if-new (file+head "${current-file}.%<%Y.%m.%d.%M%S%3N>.org"
+                              "#+title: %^{title}\n\n"))
+          ("s" "Scratch note" entry
+           "* %?"
+           :if-new (file+head "scratch.%<%Y.%m.%d.%M%S%3N>.org"
+                              "#+title: %^{title}\n\n")))))
+
+;; Some notes functions that are useful for me
+(defun dendroam-insert-ppp (&optional goto)
+  "Creates a new PPP note"
+  (interactive "P")
+  (org-roam-capture- :goto (when goto '(4))
+                     :node (org-roam-node-create)
+                     :templates org-roam-utils-capture-templates
+                     :keys "p"
+                     :props (list :default-time (current-time))))
+
+(defun dendroam-node-find-initial-input ()
+  (interactive)
+  (org-roam-node-find nil (if (buffer-file-name)
+                              (file-name-base (buffer-file-name))
+                            "")))
+
+(defun dendroam--eval-schema ()
+  (interactive)
+  (let ((file (concat org-roam-directory "cli.schema.el")))
+    (eval
+     (ignore-errors
+       (thing-at-point--read-from-whole-string
+        (with-temp-buffer
+          (insert-file-contents file)
+          (buffer-string)))))))
+
+
+(defun dendroam-node-read (&optional initial-input filter-fn require-match)
+  "Read and return an `org-roam-node'.
+INITIAL-INPUT is the initial prompt value.
+FILTER-FN is a function applied to the completion list.
+If REQUIRE-MATCH, require returning a match."
+  (let* ((nodes (org-roam-node--completions))
+         (nodes (funcall (or filter-fn #'identity) nodes))
+         (node (completing-read
+                "Node: "
+                (lambda (string pred action)
+                  (message "String: %s, pred: %s, action: %s" string pred action)
+                  (if (eq action 'metadata)
+                      '(metadata
+                        (annotation-function . (lambda (title)
+                                                 (message "title: %s" title)
+                                                 (funcall org-roam-node-annotation-function
+                                                          (get-text-property 0 'node title))))
+                        (category . org-roam-node))
+                    (message "string in complete: %s " string)
+                    (complete-with-action action nodes string pred)))
+                nil require-match initial-input)))
+    (or (cdr (assoc node nodes))
+        (org-roam-node-create :title node))))
+
+(defun test-hey ()
+  (interactive)
+  (complete-with-action t '("1" "2" "3") "2" nil))
+
+(advice-add 'org-roam-node-read :override #'dendroam-node-read)
+
+(defun vic/org-roam-title-to-slug (title)
+  "Generates a dendron-like slug from *title*
+this expects an input like: lang.elisp.what is nil
+and will create a file wih the name: lang.elisp.what-is-nil"
+  (cl-flet* ((nonspacing-mark-p (char)
+                                (eq 'Mn (get-char-code-property char 'general-category)))
+             (strip-nonspacing-marks (s)
+                                     (apply #'string (seq-remove #'nonspacing-mark-p
+                                                                 (ucs-normalize-NFD-string s))))
+             (cl-replace (title pair)
+                         (replace-regexp-in-string (car pair) (cdr pair) title)))
+    (let* ((pairs `(("[^[:alnum:][:digit:]_.]" . "-")  ;; convert anything not alphanumeric except "."
+                    (" " . "-")    ;; remove whitespaces
+                    ("__*" . "-")  ;; remove sequential underscores
+                    ("^_" . "")  ;; remove starting underscore
+                    ("_$" . "")))  ;; remove ending underscore
+           (slug (-reduce-from #'cl-replace (strip-nonspacing-marks title) pairs)))
+      (downcase slug))))
+
+
+;; (defun vic/org-roam-format-hierarchy (hierarchy)
+;;   "Formats path, title and tags to output something like:
+;; (tag1,tag2) this.is.a.hierarchy: note title
+;; where title will be the last child of the hierarchy
+;; from the filename this.is.a.hierarchy.note-title.org"
+;;   (let* ((name-split (split-string hierarchy "\\."))
+;;          (hierarchy-no-title (mapconcat 'identity        ;;get just the hierarchy without the title
+;;                                (remove (car(last name-split)) name-split) ".")))
+;;     hierarchy-no-title))
+
+(defun vic/org-roam--get-title-path-completions ()
+  "Return an alist for completion.
+The car is the displayed title for completion, and the cdr is a
+plist containing the path and title for the file."
+  (let* ((rows (org-roam-db-query [:select [files:file titles:title tags:tags files:meta] :from titles
+                                   :left :join tags
+                                   :on (= titles:file tags:file)
+                                   :left :join files
+                                   :on (= titles:file files:file)]))
+         completions)
+    (setq rows (seq-sort-by (lambda (x)
+                              (plist-get (nth 3 x) :mtime))
+                            #'time-less-p
+                            rows))
+    (dolist (row rows completions)
+      (pcase-let ((`(,file-path ,title ,tags) row))
+        (let ((k (vic/org-roam-prepend-hierarchy file-path title tags))
+              (v (list :path file-path :title title)))
+          (push (cons k v) completions))))))
+
+(defun vic/org-roam-lookup (&optional initial-prompt completions filter-fn no-confirm)
+  "Performs the same operation than org-roam-find-file but parsing initial-prompt
+to get dendron-like hierarchies
+this expects an input like: lang.elisp.what is nil
+and will create a file wih the name: lang.elisp.what-is-nil
+with a title: #+TITLE: What Is Nil"
+  (interactive)
+  (unless org-roam-mode (org-roam-mode))
+  (let* ((completions (funcall (or filter-fn #'identity)
+                               (or completions (vic/org-roam--get-title-path-completions))))
+         (title-with-tags (if no-confirm
+                              initial-prompt
+                            (org-roam-completion--completing-read "Lookup: " completions
+                                                                  :initial-input initial-prompt)))
+         (res (cdr (assoc title-with-tags completions)))
+         (file-path (plist-get res :path))
+         (base-title (car (last (split-string title-with-tags "\\.")))))
+    (if file-path
+        (org-roam--find-file file-path)
+      (let ((org-roam-capture--info `((title . ,base-title)
+                                      (slug  . ,(funcall org-roam-title-to-slug-function title-with-tags))))
+            (org-roam-capture--context 'title))
+        (setq org-roam-capture-additional-template-props (list :finalize 'find-file))
+         (org-roam-capture--capture)))))
+
+(defun vic/org-roam-insert ()
+  "a Wrapper to apply dendron lookup to insert link"
+  (interactive "P")
+  (apply #'org-roam-insert '(nil (vic/org-roam--get-title-path-completions) nil nil nil)))
+
+(defun my/org-id-update-org-roam-files ()
+  "Update Org-ID locations for all Org-roam files."
+  (interactive)
+  (org-id-update-id-locations (org-roam--list-all-files)))
+
+(defun org-roam-v1-to-v2 ()
+  ;; Create file level ID
+  (org-with-point-at 1
+    (org-id-get-create))
+  ;; Replace roam_key into properties drawer roam_ref
+  (when-let* ((refs (cdar (org-collect-keywords '("roam_key")))))
+    (org-set-property "ROAM_REFS" (combine-and-quote-strings refs))
+    (let ((case-fold-search t))
+      (org-with-point-at 1
+        (while (re-search-forward "^#\\+roam_key:" (point-max) t)
+          (beginning-of-line)
+          (kill-line)))))
+
+  ;; Replace roam_alias into properties drawer roam_aliases
+  (when-let* ((aliases (cdar (org-collect-keywords '("roam_alias")))))
+    (org-set-property "ROAM_ALIASES" (combine-and-quote-strings aliases))
+    (let ((case-fold-search t))
+      (org-with-point-at 1
+        (while (re-search-forward "^#\\+roam_alias:" (point-max) t)
+          (beginning-of-line)
+          (kill-line)))))
+  (save-buffer))
+
+(defun org-roam-replace-file-links-with-id ()
+  (org-with-point-at 1
+    (while (re-search-forward org-link-bracket-re nil t)
+      (let* ((mdata (match-data))
+             (path (match-string 1))
+             (desc (match-string 2)))
+        (when (string-prefix-p "file:" path)
+          (setq path (expand-file-name (substring path 5)))
+          (when-let ((node-id (caar (org-roam-db-query [:select [id] :from nodes
+                                                        :where (= file $s1)
+                                                        :and (= level 0)] path))))
+            (set-match-data mdata)
+            (replace-match (org-link-make-string (concat "id:" node-id) desc))))))))
+
+;; Step 1: Convert all v1 files to v2 files
+;; (dolist (f (org-roam--list-all-files))
+;;   (with-current-buffer (find-file-noselect f)
+;;     (org-roam-v1-to-v2)))
+
+;; Step 2: Build cache
+;; (org-roam-db-sync)
+
+;; Step 3: Replace all file links with id links where possible
+
+;; (dolist (f (org-roam--list-all-files))
+;;   (with-current-buffer (find-file-noselect f)
+;;     (org-roam-replace-file-links-with-id)))
+
 ;; Org roam
-(map! :leader
-      :prefix ("r" . "roam")
-      ;; :desc "insert" "i" #'org-roam-insert
-      :desc "Show graph" "g" #'org-roam-graph
-      :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
-      :desc "Org Roam Capture" "c" #'org-roam-capture
-      :desc "Org Roam" "r" #'org-roam
-      :desc "Find file" "f" #'org-roam-find-file
-      :desc "Insert (skipping capture)" "I" #'org-roam-insert-immediate
-      :desc "Capture in today's daily" "C" #'org-roam-dailies-capture-today
-      (:prefix ("d" . "Open By date")
-      :desc "Arbitrary date" "d" #'org-roam-dailies-find-date
-      :desc "Tomorrow" "m" #'org-roam-dailies-find-tomorrow
-      :desc "Today" "t" #'org-roam-dailies-find-today
-      :desc "Yesterday" "y" #'org-roam-dailies-find-yesterday )
-      ;; (:prefix ("j" . "Org Roam dailies capture")
-      ;; :desc "Arbitrary date" "d" #'org-roam-dailies-capture-date
-      ;; :desc "Tomorrow" "m" #'org-roam-dailies-capture-tomorrow
-      ;; :desc "Today" "t" #'org-roam-dailies-capture-today
-      ;; :desc "Yesterday" "y" #'org-roam-dailies-capture-yesterday )
-      )
-(map! :map org-roam-mode-map :g "C-c i" #'org-roam-insert)
+;; (map! :map org-roam-mode-map :g "C-c i" #'org-roam-node-insert)
 ;;Org journal
 (map! :leader
       :prefix ("j" . "journal")

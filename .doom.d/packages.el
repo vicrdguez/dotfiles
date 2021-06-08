@@ -58,6 +58,10 @@
 ;;(package! rainbow-delimeters)
 (package! org-roam-server
   :recipe (:host github :repo "org-roam/org-roam-server"))
+(package! org-roam
+  :recipe (:host github :repo "org-roam/org-roam" :branch "v2"))
+(package! dendroam
+  :recipe (:host github :repo "vicrdguez/dendroam" :branch "main"))
 (package! org-download)
 (package! ox-twbs)
 (package! org-super-agenda)
@@ -68,3 +72,6 @@
 (package! quelpa)
 (package! quelpa-use-package)
 (package! rainbow-mode)
+(package! org-web-tools)
+(package! org-appear)
+(package! ox-clip)
