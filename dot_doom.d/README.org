@@ -1,0 +1,457 @@
+#+title: Doom Emacs Config
+#+DATE:    April 23, 2023
+#+SINCE:  1.0
+#+STARTUP: content
+#+PROPERTY: header-args :tangle config.el
+
+
+* General
+
+#+begin_src elisp
+(load-file "~/.doom.d/utils.el")
+
+(setq user-full-name "Victor Rodriguez"
+      user-mail-address "vrodriguez@confluent.io"
+      ;; Makes sure that weekdays in the timestamps of org-mode files and the agenda appear in English
+      system-time-locale "C")
+;; (setq ns-auto-hide-menu-bar t)
+
+(setq-default fill-column 120)
+
+#+end_src
+
+#+RESULTS:
+: 120
+
+I want to add a visual vertical line showing the maximum column charachters I want to have set by ~fill-column~. To achieve we add a hook on ~prog-mode-hook~ which triggers when entering any programming mode to enable this functionlality.
+
+#+begin_src elisp
+(add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)
+#+end_src
+
+#+RESULTS:
+| display-fill-column-indicator-mode | hl-todo-mode | display-line-numbers-mode | highlight-numbers-mode | vi-tilde-fringe-mode |
+
+Auto balance
+#+begin_src elisp
+(add-hook 'window-configuration-change-hook #'vic/auto-balance-windows)
+#+end_src
+
+With ~evil-respect-visual-line-mode~ vim ~j~ and ~k~ keys use visual lines, so we can move sanely through wrapped text. [[https://archive.baty.net/2020/respecting-visual-lines-in-doom-emacs/][Respecting visual lines in (Doom) emacs]]. Sadly it didn't worked so I had to set the variable in my [[file:init.el::setq evil-respect-visual-line-mode t][init.el]], I guess to avoid race conditions overriding it.
+
+
+#+RESULTS:
+
+** Custom vars
+I put some vars here that I need since the beginning of the config so there is no conflicts trying to set a variable with another that is not set yet
+
+#+begin_src elisp
+(setq vic/org-dir "~/dev/braindump/")
+#+end_src
+
+#+RESULTS:
+: ~/dev/braindump/
+
+** Package config
+Configuring package sources
+
+#+begin_src elisp
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+#+end_src
+
+** vterm
+Use fish as the shell with ~vterm~
+
+#+begin_src elisp
+(setq vterm-shell "fish")
+#+end_src
+
+#+RESULTS:
+: fish
+
+* UI
+** Line numbers
+This determines the style of line numbers in effect. If set to `nil', line
+numbers are disabled. For relative line numbers, set this to `relative'.
+
+#+begin_src elisp
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+#+RESULTS:
+: relative
+
+** Font
+Doom exposes five (optional) variables for controlling fonts in Doom:
+- ~doom-font~ -- the primary font to use
+- ~doom-variable-pitch-font~ -- a non-monospace font (where applicable)
+- ~doom-big-font~ -- used for ~doom-big-font-mode~; use this for
+  presentations or streaming.
+- ~doom-unicode-font~ -- for unicode glyphs
+- ~doom-serif-font~ -- for the ~fixed-pitch-serif~ face
+
+ See 'C-h v doom-font' for documentation and more examples of what they
+ accept. For example:
+
+#+begin_src elisp
+(setq doom-font (font-spec :family "Iosevka" :size 14)
+      doom-variable-pitch-font (font-spec :family "Iosevka Etoile" :size 14)
+      doom-unicode-font (font-spec :family "Symbols Nerd Font Mono" :size 14))
+#+end_src
+
+#+RESULTS:
+: #<font-spec nil nil Symbols\ Nerd\ Font\ Mono nil nil nil nil nil 14 nil nil nil nil>
+
+** Modeline
+Add padding to the modeline so the display is not cut off the screen
+
+#+begin_src elisp
+(after! doom-modeline
+  (doom-modeline-def-modeline 'main
+    '(bar matches buffer-info remote-host buffer-position parrot selection-info)
+    '(misc-info minor-modes lsp checker input-method buffer-encoding major-mode process vcs "  "))) ; <-- added padding here
+#+end_src
+
+#+RESULTS:
+: doom-modeline-format--main
+
+** Org mode bullets
+Use this bullet icons instead of asterics
+
+#+begin_src elisp
+(after! org
+  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+  ;; (setq org-superstar-remove-leading-stars t
+    (setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")
+          org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+end_src
+
+Change heading font size to make it bigger
+
+#+begin_src elisp
+(custom-set-faces
+  '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+  '(org-level-2 ((t (:inherit outline-2 :height 1.2))))
+  '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
+  '(org-level-4 ((t (:inherit outline-4 :height 1.2))))
+  '(org-level-5 ((t (:inherit outline-5 :height 1.2))))
+)
+#+end_src
+
+#+RESULTS:
+
+Increase plain list indent so they are easier to read
+
+#+begin_src elisp
+(setq org-list-indent-offset 2)
+#+end_src
+
+#+RESULTS:
+: 2
+
+** Theme
+#+begin_src elisp
+(setq doom-theme 'doom-horizon)
+#+end_src
+
+#+RESULTS:
+: doom-horizon
+
+Configuring transparency to 95%
+
+#+begin_src elisp
+ (set-frame-parameter (selected-frame)'alpha '(95 . 95))
+ (add-to-list 'default-frame-alist'(alpha . (95 . 95)))
+#+end_src
+
+#+RESULTS:
+: ((alpha 95 . 95) (buffer-predicate . doom-buffer-frame-predicate) (right-divider-width . 1) (bottom-divider-width . 1) (vertical-scroll-bars) (tool-bar-lines . 0) (menu-bar-lines . 0) (left-fringe . 8) (right-fringe . 8))
+
+* File browsing
+** Dired
+Make =h= and =l= go back and forward in dired. Much faster to navigate the directory structure! If using the =dired-open= package we should use ~dired-open-file~ as a binding for =l=, and use ~dired-find-file~ ortherwise.
+
+#+begin_src elisp
+(evil-define-key 'normal dired-mode-map
+  (kbd "h") 'dired-up-directory
+  ;; (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
+  (kbd "l") 'dired-find-file) ;
+#+end_src
+
+Adding icons to dired:
+
+#+begin_src elisp
+(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+(add-hook 'dired-mode-hook (lambda ()
+                             display-fill-column-indicator-mode nil))
+#+end_src
+
+#+RESULTS:
+| (lambda nil display-fill-column-indicator-mode nil) | dired-extra-startup | all-the-icons-dired-mode | doom--recentf-add-dired-directory-h | +dired-disable-gnu-ls-flags-maybe-h | dired-omit-mode | diredfl-mode |
+
+*** Sort directories first
+For me is more confortable to have the directories listed before the files. This code solves that
+#+begin_src elisp
+(setq dired-listing-switches "--group-directories-first -al")
+#+end_src
+
+** Deft
+This package config is simple, I just need to specify my org-directory (since I'll be using =deft= just for my org mode notes).
+
+#+begin_src elisp
+(use-package deft
+  :init
+  (setq deft-directory vic/org-dir)
+  (setq deft-extensions '("org"))
+  (setq deft-recursive t))
+#+end_src
+
+#+RESULTS:
+: deft
+
+* Org mode
+This config aims to make using org mode more pleasant for writing. The interesting bits are:
+- ~org-link-frame-setup~ forces follow org links into a different window: [[file:~/.emacs.d/modules/lang/org/config.el::738][source]]
+- ~visual-fill-column-center-text~ puts the text on the center so it is more readable using ~visual-fill-column-mode~
+
+Here as well? I don't think it happens but it is annoying right? it Isaac Fuchsia you know
+
+#+begin_src elisp
+(setq org-directory vic/org-dir)
+
+(after! org (setq org-pretty-entities t
+                  org-hide-emphasis-markers t)
+  ;; (setf (alist-get 'file org-link-frame-setup) #'vic/find-file-evil-vsplit)
+  ;; hooks
+  ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
+  (add-hook 'org-mode-hook 'org-appear-mode)
+  (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+  ;; bindings
+  (map! :map org-mode-map
+        "C-k" #'org-previous-visible-heading
+        "C-j" #'org-next-visible-heading))
+#+end_src
+
+** Hooks
+I want to use centered text mode for my org mode files but not for the =helpful= documentation. So I create my own hook that I attach to org mode but not to helpful. This Hook is farily simple, it just enables ~visual-fill-column-center-text~.
+
+#+begin_src elisp :results none
+(add-hook 'org-mode-hook (lambda ()
+                           (setq visual-fill-column-center-text t)))
+#+end_src
+
+In order to make =org-roam= links open always as a vertical split on the right, we need to configure ~display-buffer-alist~. We add a new configuration that matches all the =org-roam= buffers using a regular expression, and configures the function used to display the new buffer and a set of actions that creates the desired behavior.
+
+We add the configuration to the list and include it in ~org-mode-hook~ so it is set when opening org mode files. The reason to not trying to match all org files is because that way, help pages (which are typically org files as well) also to be displayed as a vertical split.
+
+#+begin_src elisp :results none
+(add-hook 'org-mode-hook
+          (lambda ()
+            (add-to-list 'display-buffer-alist
+                  ;; '(("\\`\\*Org\\(?:-mode\\| Agenda\\)\\*"
+                  '(("\\`\\*Org-roam\\*\\*\\[[^]]+\\]\\*\\'"
+                     (display-buffer-in-side-window)
+                     (side . right)
+                     (slot . -1)
+                     (window-width . 0.33)
+                     (preserve-size . (t . nil)))
+                    ))))
+#+end_src
+
+
+#+RESULTS:
+| vic/auto-balance-windows | winner-change-fun | +doom-dashboard-resize-h | doom-modeline-invalidate-huds | doom-modeline-refresh-bars | evil-refresh-cursor | window--adjust-process-windows |
+
+** Org appear
+Org is not able to look show and hide emphasis markers dynamically (e.g. showing the markers just when the cursor is on a marked region like Obsidian). Using ~org-appear~ helps with this so it works as expected.
+
+#+begin_src elisp
+(use-package! org-appear
+  :after org
+  :init (setq org-appear-autolinks nil))
+#+end_src
+
+#+RESULTS:
+: org-appear
+
+
+#+RESULTS:
+
+** Org roam
+Package config and bindings
+
+#+begin_src elisp
+(use-package! org-roam
+  :after org
+  :init
+
+  (map! :leader
+        :prefix ("r" . "roam")
+        ;; :desc "insert" "i" #'org-roam-insert
+        :desc "Show graph" "g" #'org-roam-graph
+        :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
+        :desc "Org Roam Capture" "c" #'org-roam-capture
+        :desc "Org Roam" "r" #'org-roam-buffer-toggle
+        ;; :desc "Find node" "f" #'dendroam-node-find-initial-input
+        :desc "Find node" "f" #'org-roam-node-find
+        :desc "Insert node link" "i" #'org-roam-node-insert
+        :desc "Insert (skipping capture)" "I" #'org-roam-insert-immediate
+        :desc "Capture in today's daily" "C" #'org-roam-dailies-capture-today
+        (:prefix ("d" . "Open By date")
+         :desc "Arbitrary date" "d" #'org-roam-dailies-find-date
+         :desc "Tomorrow" "m" #'org-roam-dailies-find-tomorrow
+         :desc "Today" "t" #'org-roam-dailies-find-today
+         :desc "Yesterday" "y" #'org-roam-dailies-find-yesterday )
+        ;; (:prefix ("j" . "Org Roam dailies capture")
+        ;; :desc "Arbitrary date" "d" #'org-roam-dailies-capture-date
+        ;; :desc "Tomorrow" "m" #'org-roam-dailies-capture-tomorrow
+        ;; :desc "Today" "t" #'org-roam-dailies-capture-today
+        ;; :desc "Yesterday" "y" #'org-roam-dailies-capture-yesterday )
+        )
+  (global-set-key (kbd "C-c i") #'org-roam-node-insert)
+  ;; (define-key map (kbd "C-c i") 'org-roam-node-insert)
+  (setq org-roam-directory vic/org-dir
+        org-roam-node-display-template (format "%s ${doom-hierarchy:*} %s"
+                                               (propertize "${doom-tags:20}" 'face 'org-tag)
+                                               (propertize "${doom-type:12}" 'face 'font-lock-keyword-face)))
+  ;; (add-to-list 'display-buffer-alist
+  ;;            '(("^\\*org-roam\\*"
+  ;;               (display-buffer-in-direction)
+  ;;               (direction . right)
+  ;;               (window-width . 0.33)
+  ;;               (window-height . fit-window-to-buffer))))
+  )
+#+end_src
+
+#+RESULTS:
+: org-roam
+
+I prefer to keep the =org-roam= buffer as a /sidebar/, it is a regular window though, so this configuration makes it not replace other windows and be smaller
+
+#+begin_src elisp :results none
+(after! org-roam
+  (set-popup-rules!
+    `((,(regexp-quote org-roam-buffer) ; persistent org-roam buffer
+       :side right :width 0.20 :height 0.5 :ttl nil :modeline nil :quit nil :slot 1)
+      ("^\\*org-roam: " ; node dedicated org-roam buffer
+       :side right :width 0.20 :height 0.5 :ttl nil :modeline nil :quit nil :slot 2))))
+#+end_src
+
+
+*** Capture templates
+#+begin_src elisp
+(setq org-roam-capture-templates
+      '(("m" "main" plain
+         "%?"
+         :if-new (file+head "main/${slug}.org"
+                            "#+title: ${title}\n")
+         :immediate-finish t
+         :unnarrowed t)
+        ("r" "reference" plain "%?"
+         :if-new
+         (file+head "reference/${title}.org" "#+title: ${title}\n#+filetags: :reference:")
+         :immediate-finish t
+         :unnarrowed t)
+        ;; ("m" "Meeting" plain "%?"
+        ;;  :file-name "%<%Y%m%d%H%M%S>-${slug}"
+        ;;  :head "#+title: ${title}"
+        ;;  :unnarrowed t
+        ;;  :immediate-finish t)
+        ;; ("c" "Customer" plain "%?"
+        ;;  :file-name "${slug}"
+        ;;  :head "#+title: ${title}"
+        ;;  :unnarrowed t
+        ;;  :immediate-finish t)
+        ("d" "draft" plain "%?"
+         :if-new
+         (file+head "drafts/${title}.org" "#+title: ${title}\n#+filetags: :draft:\n")
+         :immediate-finish t
+         :unnarrowed t)))
+#+end_src
+
+#+RESULTS:
+| m | main | plain | %? | :if-new | (file+head main/${slug}.org #+title: ${title} |
+*** Consult org roam
+#+begin_src elisp
+(use-package! consult-org-roam
+  :ensure t
+  :after org-roam
+  :init
+  (require 'consult-org-roam)
+  (consult-org-roam-mode 1)
+  :custom
+  (consult-org-roam-grep-func #'consult-ripgrep))
+#+end_src
+
+#+RESULTS:
+: consult-org-roam
+
+** Org Babel
+Appart from evaluating =emacs-lisp= code blocks in org mode I also want to evaluate =bash= code block evaluation so we need to add ~shell~ to the =org-babel= loaded languages.
+
+Refereces:
+- https://orgmode.org/manual/Languages.html
+- https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-shell.html
+
+#+begin_src elisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (shell . t)))
+#+end_src
+
+* LSP
+** bashls
+
+#+begin_src elisp
+(setq lsp-bash-highlight-parsing-errors t)
+#+end_src
+
+* Doom package config doc
+;; Whenever you reconfigure a package, make sure to wrap your config in an
+;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
+;;
+;;   (after! PACKAGE
+;;     (setq x y))
+;;
+;; The exceptions to this rule:
+;;
+;;   - Setting file/directory variables (like `org-directory')
+;;   - Setting variables which explicitly tell you to set them before their
+;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
+;;   - Setting doom variables (which start with 'doom-' or '+').
+;;
+;; Here are some additional functions/macros that will help you configure Doom.
+;;
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
+;;
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
+;; etc).
+;;
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
+
+
+thi
+
+
+asafetida
+
+
+This happen also here? I don't know
+
+This also  happens here? because I can't see it. I so
+We add the configuration to the list and include it in ~org-mode-hook~ so it is set when opening org mode files. The reason to not trying to match all org files is because that way, help pages (which are typically org files as well) also to be displayed as a vertical split. and als this continues to happ but I don't know

@@ -1,0 +1,101 @@
+#!/usr/bin/env sh
+
+# the scripting-addition must be loaded manually if
+# you are running yabai on macOS Big Sur. Uncomment
+# the following line to have the injection performed
+# when the config is executed during startup.
+#
+# for this to work you must configure sudo such that
+# it will be able to run the command without password
+#
+# see this wiki page for information:
+#  - https://github.com/koekeishiya/yabai/wiki/Installing-yabai-(latest-release)
+#
+# sudo yabai --load-sa
+# yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+sudo yabai --load-sa
+
+# My custom space names. These names are used in some of my scripts.
+yabai -m space 1 --label one
+yabai -m space 2 --label two
+yabai -m space 3 --label three
+yabai -m space 4 --label four
+yabai -m space 5 --label five
+yabai -m space 6 --label six
+yabai -m space 9 --label nine
+
+float_rule() {
+	pattern="$1=$2"
+	shift 2
+	opts=" $*"
+	yabai -m rule --add ${pattern}${opts} layer=above grid=4:4:1:1:2:2 manage=off
+}
+# float system preferences. Most of these just diable Yabai form resizing them.
+float_rule "app" "^System Preferences$" "sticky=on" "layer=above"
+float_rule "app" "^Karabiner-Elements$" "sticky=on" "layer=above"
+float_rule "app" "^Karabiner-EventViewer$" "sticky=on" "layer=above"
+# float_rule "app" "^Finder$" "layer=above"
+float_rule "app" "^Keka$" "sticky=on" "layer=above"
+float_rule "app" "^Alfred Preferences$" "sticky=on" "layer=above"
+float_rule "app" "^Disk Utility$" "sticky=on" "layer=above"
+float_rule "app" "^System Information$" "sticky=on" "layer=above"
+float_rule "app" "^Activity Monitor$" "sticky=on" "layer=above"
+float_rule "app" "^Path Finder$"
+float_rule "app" "^TeamViewer$" "sticky=on" "layer=above"
+float_rule "app" "Fantastical"
+float_rule "app" "^Spotify$"
+float_rule "app" "^iTerm2$"
+float_rule "app" "^Flux$"
+float_rule "app" "^Time Out$"
+float_rule "app" "^perl_client_app$"
+float_rule "app" "^console$"
+float_rule "app" "^Harvest$"
+float_rule "app" "^CiscoSparkHelper$"
+float_rule "app" "^Logi Options$"
+float_rule "app" "^Cisco Webex Start$"
+float_rule "app" "^Private Internet Access$"
+float_rule "app" "^IntelliJ IDEA$"
+float_rule "app" "^Wally$"
+float_rule "app" "^Logitech.*"
+float_rule "app" "^[Rr]aycast.*"
+float_rule "title" ".*[Rr]aycast.*"
+float_rule "title" "^New.*Message.*" # mimestream
+float_rule "title" "^Fwd.*"          # mimestream
+float_rule "title" "^[Rr]e.*"        # mimestream
+
+# global settings
+yabai -m config mouse_follows_focus off
+yabai -m config focus_follows_mouse off
+yabai -m config window_placement second_child
+yabai -m config window_topmost off
+yabai -m config window_shadow on
+yabai -m config window_opacity off
+yabai -m config window_opacity_duration 0.0
+yabai -m config active_window_opacity 1.0
+yabai -m config normal_window_opacity 0.90
+yabai -m config window_border on
+yabai -m config window_border_width 3
+yabai -m config active_window_border_color 0xff76946A
+yabai -m config normal_window_border_color 0xff555555
+yabai -m config insert_feedback_color 0xffd75f5f
+yabai -m config split_ratio 0.50
+yabai -m config auto_balance off
+yabai -m config mouse_modifier ctrl
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+yabai -m config mouse_drop_action swap
+
+# general space settings
+yabai -m config layout bsp
+yabai -m config top_padding 10
+yabai -m config bottom_padding 10
+yabai -m config left_padding 10
+yabai -m config right_padding 10
+yabai -m config window_gap 10
+
+## If I close the active window, focus on any other visible window.
+#yabai -m signal --add event=window_destroyed action="bash /Users/jesseskelton/CustomScripts/SwitchSpaces/window-focus-on-destroy.sh"
+
+echo "yabai config loaded.."

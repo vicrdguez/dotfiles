@@ -1,0 +1,220 @@
+#+title: bak-readme
+
+
+#+begin_src elisp
+(setq org-directory vic/org-dir)
+
+
+;; (after! org (setq org-pretty-entities t
+;;                   org-hide-emphasis-markers t)
+;;   ;; (setf (alist-get 'file org-link-frame-setup) #'vic/find-file-evil-vsplit)
+;;   ;; hooks
+;;   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
+;;   (add-hook 'org-mode-hook 'org-appear-mode)
+;;   (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+;;   ;; bindings
+;;   (map! :map org-mode-map
+;;         "C-k" #'org-previous-visible-heading
+;;         "C-j" #'org-next-visible-heading))
+#+end_src
+
+
+over hooks is not that Terraba and I don't know why think it happen
+** Hooks
+I want to use centered text mode for my org mode files but not for the =helpful= documentation. So I create my own hook that I attach to org mode but not to helpful. This Hook is farily simple, it just enables ~visual-fill-column-center-text~.
+
+#+begin_src elisp :results none
+;; (add-hook 'org-mode-hook (lambda ()
+;;                            (setq visual-fill-column-center-text t)))
+#+end_src
+
+In order to make =org-roam= links open always as a vertical split on the right, we need to configure ~display-buffer-alist~. We add a new configuration that matches all the =org-roam= buffers using a regular expression, and configures the function used to display the new buffer and a set of actions that creates the desired behavior.
+
+We add the configuration to the list and include it in ~org-mode-hook~ so it is set when opening org mode files. The reason to not trying to match all org files is because that way, help pages (which are typically org files as well) also to be displayed as a vertical split.
+
+#+begin_src elisp :results none
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (add-to-list 'display-buffer-alist
+;;                   ;; '(("\\`\\*Org\\(?:-mode\\| Agenda\\)\\*"
+;;                   '(("\\`\\*Org-roam\\*\\*\\[[^]]+\\]\\*\\'"
+;;                      (display-buffer-in-side-window)
+;;                      (side . right)
+;;                      (slot . -1)
+;;                      (window-width . 0.33)
+;;                      (preserve-size . (t . nil)))
+;;                     ))))
+#+end_src
+
+
+and her is terrible and the mode
+
+** Org appear
+Org is not able to look show and hide emphasis markers dynamically (e.g. showing the markers just when the cursor is on a marked region like Obsidian). Using ~org-appear~ helps with this so it works as expected.
+
+#+begin_src elisp
+(use-package! org-appear
+  :after org
+  :init (setq org-appear-autolinks nil))
+#+end_src
+
+#+RESULTS:
+: org-appear
+
+
+#+RESULTS:
+
+** Org roam
+Package config and bindings
+
+#+begin_src elisp
+(use-package! org-roam
+  :after org
+  :init
+
+  (map! :leader
+        :prefix ("r" . "roam")
+        ;; :desc "insert" "i" #'org-roam-insert
+        :desc "Show graph" "g" #'org-roam-graph
+        :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
+        :desc "Org Roam Capture" "c" #'org-roam-capture
+        :desc "Org Roam" "r" #'org-roam-buffer-toggle
+        ;; :desc "Find node" "f" #'dendroam-node-find-initial-input
+        :desc "Find node" "f" #'org-roam-node-find
+        :desc "Insert node link" "i" #'org-roam-node-insert
+        :desc "Insert (skipping capture)" "I" #'org-roam-insert-immediate
+        :desc "Capture in today's daily" "C" #'org-roam-dailies-capture-today
+        (:prefix ("d" . "Open By date")
+         :desc "Arbitrary date" "d" #'org-roam-dailies-find-date
+         :desc "Tomorrow" "m" #'org-roam-dailies-find-tomorrow
+         :desc "Today" "t" #'org-roam-dailies-find-today
+         :desc "Yesterday" "y" #'org-roam-dailies-find-yesterday )
+        ;; (:prefix ("j" . "Org Roam dailies capture")
+        ;; :desc "Arbitrary date" "d" #'org-roam-dailies-capture-date
+        ;; :desc "Tomorrow" "m" #'org-roam-dailies-capture-tomorrow
+        ;; :desc "Today" "t" #'org-roam-dailies-capture-today
+        ;; :desc "Yesterday" "y" #'org-roam-dailies-capture-yesterday )
+        )
+  ;; (map! :map org-roam-mode-map
+  ;;       :g "C-c i" 'org-roam-node-insert)
+  (global-set-key (kbd "C-c i") #'org-roam-node-insert)
+  ;; (define-key map (kbd "C-c i") 'org-roam-node-insert)
+  (setq org-roam-directory vic/org-dir
+        org-roam-node-display-template (format "%s ${doom-hierarchy:*} %s"
+                                               (propertize "${doom-tags:20}" 'face 'org-tag)
+                                               (propertize "${doom-type:12}" 'face 'font-lock-keyword-face)))
+  ;; (add-to-list 'display-buffer-alist
+  ;;            '(("^\\*org-roam\\*"
+  ;;               (display-buffer-in-direction)
+  ;;               (direction . right)
+  ;;               (window-width . 0.33)
+  ;;               (window-height . fit-window-to-buffer))))
+  )
+#+end_src
+
+#+RESULTS:
+: org-roam
+
+*** Capture templates
+#+begin_src elisp
+(setq org-roam-capture-templates
+      '(("m" "main" plain
+         "%?"
+         :if-new (file+head "main/${slug}.org"
+                            "#+title: ${title}\n")
+         :immediate-finish t
+         :unnarrowed t)
+        ("r" "reference" plain "%?"
+         :if-new
+         (file+head "reference/${title}.org" "#+title: ${title}\n#+filetags: :reference:")
+         :immediate-finish t
+         :unnarrowed t)
+        ("d" "daft" plain "%?"
+         :if-new
+         (file+head "drafts/${title}.org" "#+title: ${title}\n#+filetags: :draft:\n")
+         :immediate-finish t
+         :unnarrowed t)))
+#+end_src
+
+#+RESULTS:
+| m | main | plain | %? | :if-new | (file+head main/${slug}.org #+title: ${title} |
+*** Consult org roam
+#+begin_src elisp
+(use-package! consult-org-roam
+  :ensure t
+  :after org-roam
+  :init
+  (require 'consult-org-roam)
+  (consult-org-roam-mode 1)
+  :custom
+  (consult-org-roam-grep-func #'consult-ripgrep))
+#+end_src
+
+#+RESULTS:
+: consult-org-roam
+
+** Org Babel
+Appart from evaluating =emacs-lisp= code blocks in org mode I also want to evaluate =bash= code block evaluation so we need to add ~shell~ to the =org-babel= loaded languages.
+
+Refereces:
+- https://orgmode.org/manual/Languages.html
+- https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-shell.html
+
+#+begin_src elisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (shell . t)))
+#+end_src
+
+* LSP
+** bashls
+
+#+begin_src elisp
+(setq lsp-bash-highlight-parsing-errors t)
+#+end_src
+
+* Doom package config doc
+;; Whenever you reconfigure a package, make sure to wrap your config in an
+;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
+;;
+;;   (after! PACKAGE
+;;     (setq x y))
+;;
+;; The exceptions to this rule:
+;;
+;;   - Setting file/directory variables (like `org-directory')
+;;   - Setting variables which explicitly tell you to set them before their
+;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
+;;   - Setting doom variables (which start with 'doom-' or '+').
+;;
+;; Here are some additional functions/macros that will help you configure Doom.
+;;
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
+;;
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
+;; etc).
+;;
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
+
+
+thi
+
+
+asafetida
+
+
+This happen also here? I don't know
+
+This also  happens here? because I can't see it. I so
+We add the configuration to the list and include it in ~org-mode-hook~ so it is set when opening org mode files. The reason to not trying to match all org files is because that way, help pages (which are typically org files as well) also to be displayed as a vertical split. and als this continues to happ but I don't know

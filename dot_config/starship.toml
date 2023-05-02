@@ -1,0 +1,71 @@
+[aws]
+symbol = "  "
+
+[buf]
+symbol = " "
+
+
+[directory]
+read_only = " "
+
+[docker_context]
+symbol = " "
+
+[git_branch]
+symbol = " "
+
+[golang]
+symbol = " "
+
+
+[java]
+symbol = " "
+
+[julia]
+symbol = " "
+#
+[lua]
+symbol = " "
+# # format = "[  $version] (bold blue)"
+#
+[memory_usage]
+symbol = " "
+
+# [nix_shell]
+# symbol = " "
+
+[nodejs]
+symbol = " "
+
+# [os.symbols]
+# # Alpine = " "
+# # Amazon = " "
+# # Android = " "
+# # Arch = " "
+# # Linux = " "
+# Linux = " "
+# Macos = " "
+# [os]
+# Macos = " "
+
+[package]
+symbol = " "
+
+[python]
+symbol = " "
+
+[rlang]
+symbol = "ﳒ "
+
+[ruby]
+symbol = " "
+
+[rust]
+symbol = " "
+
+[scala]
+symbol = " "
+
+[spack]
+symbol = "🅢 "
+

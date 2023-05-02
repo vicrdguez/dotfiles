@@ -1,0 +1,75 @@
+## Quickly restart the yabai launch agent
+ctrl + alt + cmd - r : launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
+# Kill focused window
+alt + cmd - backspace : $(yabai -m window $(yabai -m query --windows --window | jq -re ".id") --close)
+
+# Windows
+## Change window focus
+alt - h : yabai -m window --focus west
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - l : yabai -m window --focus east
+
+## windows movement
+shift + alt - h : yabai -m window --swap west
+shift + alt - j : yabai -m window --swap south
+shift + alt - k : yabai -m window --swap north
+shift + alt - l : yabai -m window --swap east
+
+## windows resize
+ctrl + alt - h : yabai -m window --resize left:-80:0 || yabai -m window --resize right:-80:0
+ctrl + alt - l : yabai -m window --resize left:80:0 || yabai -m window --resize right:80:0
+
+#Space window changing
+shift + cmd - 1 : yabai -m window --space 1
+shift + cmd - 2 : yabai -m window --space 2
+shift + cmd - 3 : yabai -m window --space 3
+shift + cmd - 4 : yabai -m window --space 4
+shift + cmd - 5 : yabai -m window --space 5
+
+#Space focus
+alt + cmd - 1 : yabai -m space --focus 1
+alt + cmd - 2 : yabai -m space --focus 2
+alt + cmd - 3 : yabai -m space --focus 3
+alt + cmd - 4 : yabai -m space --focus 4
+## Change to the last space
+shift + alt - p: yabai -m space --focus recent
+## Focus next space including both screens and cycle
+ctrl - right: yabai -m space --focus next || yabai -m space --focus first
+ctrl - left: yabai -m space --focus prev || yabai -m space --focus last
+# rotate space
+shift + alt - r: yabai -m space --rotate 90
+
+# Create and destroy spaces
+## create space and follow focus
+shift + alt - o: yabai -m space --create && \
+                 index="$(yabai -m query --spaces --display | jq 'map(select(."is-native-fullscreen" == false))[-1].index')" && \
+                yabai -m space --focus "${index}"
+
+## create space, move window and follow focus
+shift + alt - n: yabai -m space --create && \
+                 index="$(yabai -m query --spaces --display | jq 'map(select(."is-native-fullscreen" == false))[-1].index')" && \
+                 yabai -m window --space "${index}" && \
+                 yabai -m space --focus "${index}"
+
+shift + alt - u: yabai -m space --destroy
+
+# Full screen options
+cmd - 0x2F : yabai -m window --toggle zoom-fullscreen # cmd + .
+cmd - down: yabai -m window --toggle zoom-parent
+# Toggle floating
+#
+cmd - 0x29 : yabai -m window --toggle float; yabai -m window --grid 4:4:1:1:2:2 # cmd + ; 
+
+# Focus the last screen
+alt - tab : yabai -m display --focus recent
+
+# Move window to a specific screen
+ctrl + cmd - 1 : yabai -m window --display 1 yabai -m display --focus 1
+ctrl + cmd - 2 : yabai -m window --display 2 yabai -m display --focus 2
+# ctrl + cmd - 3 : yabai -m window --display 3 yabai -m display --focus 3
+## toggle move windows between two screens 
+ctrl + alt - tab : ~/.config/skhd/move-to-display.sh
+
+# toggle whether the focused window should be shown on all spaces
+shift + alt - return : yabai -m window --toggle sticky
