@@ -48,11 +48,15 @@
   display-buffer-alist)
 
 (defun vic/auto-balance-windows ()
-  "Auto-balance windows when new buffers are created. Excludes the `Org Src` buffer since emacs freezes when opening it"
+  "Auto-balance windows when new buffers are created. Excludes the following buffers that make emacs freez when balanced
+or give other problems:
+- `Org Src' buffer
+- `doom' buffer in specific this targets the scratch buffer
+- `helpful' buffer so it keeps its size
+- `which-key' buffer was difficult to target, but using `window-parent' as parameter for `balance-windows' worked"
   (unless
       (or
        (string-match-p "^\\*Org Src" (buffer-name (current-buffer)))
-       (string-match-p "^ \\*which-key" (buffer-name (current-buffer)))
        (string-match-p "^\\*doom" (buffer-name (current-buffer)))
        (string-match-p "^\\*helpful" (buffer-name (current-buffer))))
     (balance-windows (window-parent))))
