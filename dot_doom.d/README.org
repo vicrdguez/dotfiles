@@ -6,23 +6,43 @@
 
 
 * General
+Basic variables to set:
 
 #+begin_src elisp
-(load-file "~/.doom.d/utils.el") (setq user-full-name "Victor Rodriguez" user-mail-address "vrodriguez@confluent.io" ;; Makes sure that weekdays in the timestamps of org-mode files and the agenda appear in English system-time-locale "C") ;; (setq ns-auto-hide-menu-bar t) (setq-default fill-column 120)
+(load-file "~/.doom.d/utils.el")
+(setq user-full-name "Victor Rodriguez"
+      user-mail-address "vrodriguez@confluent.io"
+      ;; Makes sure that weekdays in the timestamps of org-mode files and the agenda appear in English
+      system-time-locale "C")
+
+(setq-default fill-column 120)
 #+end_src
 
 #+RESULTS: : 120
 
 I want to add a visual vertical line showing the maximum column charachters I want to have set by ~fill-column~. To achieve we add a hook on ~prog-mode-hook~ which triggers when entering any programming mode to enable this functionlality.
+
 #+begin_src elisp
 (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)
 #+end_src
+
+Adding a hook that auto-balances windows on any window change. This custom function excludes some common windows and popups that I don't want resized.
 
 #+begin_src elisp
 (add-hook 'window-configuration-change-hook #'vic/auto-balance-windows)
 #+end_src
 
-With ~evil-respect-visual-line-mode~ vim ~j~ and ~k~ keys use visual lines, so we can move sanely through wrapped text. [[https://archive.baty.net/2020/respecting-visual-lines-in-doom-emacs/][Respecting visual lines in (Doom) emacs]]. Sadly it didn't worked so I had to set the variable in my [[file:init.el::setq evil-respect-visual-line-mode t][init.el]], I guess to avoid race conditions overriding it. #+RESULTS:
+
+This hooks executes after saving any file, the function attached adds changes made to *just* to the doom config into [[https://www.chezmoi.io/][chezmoi]] tracking directory.
+
+#+begin_src elisp
+(add-hook 'after-save-hook #'vic/chezmoi-re-add-on-save)
+#+end_src
+
+#+RESULTS:
+| vic/chezmoi-re-add-on-save | rmail-after-save-hook | doom-modeline-update-vcs-text | doom-modeline-update-vcs-icon | doom-modeline-update-buffer-file-name | +evil-display-vimlike-save-message-h | doom-auto-revert-buffers-h | doom-guess-mode-h |
+
+With ~evil-respect-visual-line-mode~ vim ~j~ and ~k~ keys use visual lines, so we can move sanely through wrapped text. [[https://archive.baty.net/2020/respecting-visual-lines-in-doom-emacs/][Respecting visual lines in (Doom) emacs]]. Sadly it didn't worked so I had to set the variable in my [[file:init.el::setq evil-respect-visual-line-mode t][init.el]], I guess to avoid race conditions overriding it.
 
 ** Custom vars
 I put some vars here that I need since the beginning of the config so there is no conflicts trying to set a variable with another that is not set yet

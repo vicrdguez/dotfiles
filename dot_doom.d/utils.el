@@ -1,18 +1,5 @@
 ;;; utils.el -*- lexical-binding: t; -*-
 
-
-  ;; (interactive
-  ;;  (list
-  ;;   (intern (completing-read "Load custom theme: "
-  ;;                            (mapcar #'symbol-name
-  ;;       			     (custom-available-themes))))
-
-;; (defun vic/test-completing-read
-;;     (interactive
-;;      (list
-;;       (intern (completing-read "Select customer: ")))))
-
-
 (defun vic/display-new-buffer-vsplit (buffer force-other-window)
   (or (get-buffer-window buffer)
       (if (> (count-windows) 6)
@@ -71,13 +58,12 @@
     (balance-windows (window-parent))))
 
 (defun vic/chezmoi-re-add-on-save ()
-  "Run a shell command on save for files in a specific folder."
+  "Runs `chezmoi add ' for `doom-user-dir' when any of the files in it is changed, so the doom user config gets tracked
+by the chezmoi dotfiles manager"
   (when (string-prefix-p doom-user-dir buffer-file-name)
-    ;; (shell-command (concat "chezmoi re-add" doom-user-dir))
-    (message (concat "chezmoi re-add " doom-user-dir))
-    ))
+    (message (concat "chezmoi add " doom-user-dir))
+    (shell-command (concat "chezmoi add " doom-user-dir))))
 
-;; (add-hook 'after-save-hook 'my-shell-command-on-save)
 
 ;; (defun create-meeting-note ()
 ;;   "Create a meeting note under the selected customer folder with org-capture and add it to org-roam."
