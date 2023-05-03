@@ -62,8 +62,22 @@
 
 (defun vic/auto-balance-windows ()
   "Auto-balance windows when new buffers are created. Excludes the `Org Src` buffer since emacs freezes when opening it"
-  (unless (string-match-p "^\\*Org Src" (buffer-name (current-buffer)))
-    (balance-windows)))
+  (unless
+      (or
+       (string-match-p "^\\*Org Src" (buffer-name (current-buffer)))
+       (string-match-p "^ \\*which-key" (buffer-name (current-buffer)))
+       (string-match-p "^\\*doom" (buffer-name (current-buffer)))
+       (string-match-p "^\\*helpful" (buffer-name (current-buffer))))
+    (balance-windows (window-parent))))
+
+(defun vic/chezmoi-re-add-on-save ()
+  "Run a shell command on save for files in a specific folder."
+  (when (string-prefix-p doom-user-dir buffer-file-name)
+    ;; (shell-command (concat "chezmoi re-add" doom-user-dir))
+    (message (concat "chezmoi re-add " doom-user-dir))
+    ))
+
+;; (add-hook 'after-save-hook 'my-shell-command-on-save)
 
 ;; (defun create-meeting-note ()
 ;;   "Create a meeting note under the selected customer folder with org-capture and add it to org-roam."
@@ -122,5 +136,26 @@
 ;;   (interactive)
 ;;   (let ((customer (completing-read "Select customer: " (directory-files "~/customers/" t "^[^\.]"))))
 ;;     (org-roam-capture :keys "m" :node (org-roam-node-create :title customer :tags '("customer")) :extra-args `(:file ,(concat "~/customers/" customer "/meetings/" (format-time-string "%Y%m%d%H%M%S") "-" (downcase (replace-regexp-in-string " " "-" customer)) ".org"))))))
+
+
+(defun vic/org-roam-db-get-customers ()
+  (let ((customers
+         (org-roam-db-query [:select [nodes:title, nodes]
+                                     :from nodes
+                                     :join tags :on (= nodes:id tags:node_id)
+                                     :where (= tags:tag "customer")])))
+    customers))
+
+(defun vic/org-roam-pick-maybe-create-customer ()
+    (interactive)
+  (let ((customer (completing-read "Select customer: " (vic/org-roam-db-get-customers))))
+    (message "Customer is: %s" customer))
+    )
+
+
+;; Org-roam custom getters
+(cl-defmethod org-roam-node-cust-name (node)
+  "Gets customer"
+  (file-name-base (org-roam-node-file node)))
 
 (provide 'vic-utils)
