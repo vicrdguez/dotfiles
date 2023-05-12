@@ -37,10 +37,8 @@ This hooks executes after saving any file, the function attached adds changes ma
 
 #+begin_src elisp
 (add-hook 'after-save-hook #'vic/chezmoi-re-add-on-save)
-#+end_src
 
-#+RESULTS:
-| vic/chezmoi-re-add-on-save | rmail-after-save-hook | doom-modeline-update-vcs-text | doom-modeline-update-vcs-icon | doom-modeline-update-buffer-file-name | +evil-display-vimlike-save-message-h | doom-auto-revert-buffers-h | doom-guess-mode-h |
+#+end_src
 
 With ~evil-respect-visual-line-mode~ vim ~j~ and ~k~ keys use visual lines, so we can move sanely through wrapped text. [[https://archive.baty.net/2020/respecting-visual-lines-in-doom-emacs/][Respecting visual lines in (Doom) emacs]]. Sadly it didn't worked so I had to set the variable in my [[file:init.el::setq evil-respect-visual-line-mode t][init.el]], I guess to avoid race conditions overriding it.
 
@@ -98,7 +96,6 @@ Doom exposes five (optional) variables for controlling fonts in Doom:
 
  See 'C-h v doom-font' for documentation and more examples of what they
  accept. For example:
-
 #+begin_src elisp
 (setq doom-font (font-spec :family "Iosevka" :size 14)
       doom-variable-pitch-font (font-spec :family "Iosevka Etoile" :size 14)
@@ -121,16 +118,22 @@ Add padding to the modeline so the display is not cut off the screen
 #+RESULTS:
 : doom-modeline-format--main
 
-** Org mode bullets
-Use this bullet icons instead of asterics
+** Org mode stylling
+
+~org-modern-mode~ prettyfies org-mode a lot. I enable it globaly. The bullet star icons are modified by custom in [[file:custom.el::(custom-set-variables][custom.el]]
 
 #+begin_src elisp
-(after! org
-  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
-  ;; (setq org-superstar-remove-leading-stars t
-    (setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")
-          org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+;; (after! org
+;;   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+;;   ;; (setq org-superstar-remove-leading-stars t
+;;     (setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")
+;;           org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+(with-eval-after-load 'org (global-org-modern-mode))
+
 #+end_src
+
+#+RESULTS:
 
 Change heading font size to make it bigger
 
@@ -157,11 +160,11 @@ Increase plain list indent so they are easier to read
 
 ** Theme
 #+begin_src elisp
-(setq doom-theme 'doom-horizon)
+(setq doom-theme 'doom-gruvbox)
 #+end_src
 
 #+RESULTS:
-: doom-horizon
+: doom-gruvbox
 
 Configuring transparency to 95%
 
@@ -220,14 +223,15 @@ This config aims to make using org mode more pleasant for writing. The interesti
 - ~org-link-frame-setup~ forces follow org links into a different window: [[file:~/.emacs.d/modules/lang/org/config.el::738][source]]
 - ~visual-fill-column-center-text~ puts the text on the center so it is more readable using ~visual-fill-column-mode~
 
-Here as well? I don't think it happens but it is annoying right? it Isaac Fuchsia you know
 
 #+begin_src elisp
 (setq org-directory vic/org-dir)
 
 (after! org (setq org-pretty-entities t
                   org-hide-emphasis-markers t)
-  ;; (setf (alist-get 'file org-link-frame-setup) #'vic/find-file-evil-vsplit)
+  (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
+  (setq split-height-threshold nil)
+  (setq split-width-threshold 0)
   ;; hooks
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
   (add-hook 'org-mode-hook 'org-appear-mode)
@@ -238,12 +242,16 @@ Here as well? I don't think it happens but it is annoying right? it Isaac Fuchsi
         "C-j" #'org-next-visible-heading))
 #+end_src
 
+#+RESULTS:
+
 ** Hooks
 I want to use centered text mode for my org mode files but not for the =helpful= documentation. So I create my own hook that I attach to org mode but not to helpful. This Hook is farily simple, it just enables ~visual-fill-column-center-text~.
 
 #+begin_src elisp :results none
 (add-hook 'org-mode-hook (lambda ()
-                           (setq visual-fill-column-center-text t)))
+                           (setq visual-fill-column-center-text nil)
+                           (setq visual-fill-column-enable-sensible-window-split t)
+                           (setq visual-fill-column-width 120)))
 #+end_src
 
 In order to make =org-roam= links open always as a vertical split on the right, we need to configure ~display-buffer-alist~. We add a new configuration that matches all the =org-roam= buffers using a regular expression, and configures the function used to display the new buffer and a set of actions that creates the desired behavior.
@@ -264,9 +272,27 @@ We add the configuration to the list and include it in ~org-mode-hook~ so it is 
                     ))))
 #+end_src
 
+I want also to auto pair tildes (~~~) for inline code. This should make the trick by using and enabling 
+
+#+begin_src elisp
+(defvar vic/org-electric-pairs '((?~ . ?~) (?/ . ?/) (?= . ?=)) "Electric pairs for org-mode.")
+
+(defun org-add-electric-pairs ()
+  (electric-pair-mode  1)
+  (setq-local electric-pair-pairs (append electric-pair-pairs vic/org-electric-pairs))
+  (setq-local electric-pair-text-pairs electric-pair-pairs))
+
+(add-hook 'org-mode-hook 'org-add-electric-pairs)
+#+end_src
+
+Enabling Latex inline preview:
+
+#+begin_src elisp
+(add-hook 'org-mode-hook 'org-fragtog-mode)
+#+end_src
 
 #+RESULTS:
-| vic/auto-balance-windows | winner-change-fun | +doom-dashboard-resize-h | doom-modeline-invalidate-huds | doom-modeline-refresh-bars | evil-refresh-cursor | window--adjust-process-windows |
+
 
 ** Org appear
 Org is not able to look show and hide emphasis markers dynamically (e.g. showing the markers just when the cursor is on a marked region like Obsidian). Using ~org-appear~ helps with this so it works as expected.
@@ -317,16 +343,9 @@ Package config and bindings
   (global-set-key (kbd "C-c i") #'org-roam-node-insert)
   ;; (define-key map (kbd "C-c i") 'org-roam-node-insert)
   (setq org-roam-directory vic/org-dir
-        org-roam-node-display-template (format "%s %s ${doom-hierarchy:*} "
+        org-roam-node-display-template (format "%s %s ${doom-hierarchy-alias:*} ${backlinkscount}"
                                                (propertize "${doom-type:10}" 'face 'font-lock-keyword-face)
-                                               (propertize "${doom-tags:20}" 'face 'org-tag)))
-  ;; (add-to-list 'display-buffer-alist
-  ;;            '(("^\\*org-roam\\*"
-  ;;               (display-buffer-in-direction)
-  ;;               (direction . right)
-  ;;               (window-width . 0.33)
-  ;;               (window-height . fit-window-to-buffer))))
-  )
+                                               (propertize "${doom-tags:20}" 'face 'org-tag))))
 #+end_src
 
 #+RESULTS:
@@ -355,20 +374,30 @@ I prefer to keep the =org-roam= buffer as a /sidebar/, it is a regular window th
          :unnarrowed t)
         ("r" "reference" plain "%?"
          :if-new
-         (file+head "reference/${title}.org" "#+title: ${title}\n#+filetags: :reference:")
+         (file+head "refs/${title}.org" "#+title: ${title}\n#+filetags: :reference:")
          :immediate-finish t
          :unnarrowed t)
-        ;; ("m" "Meeting" plain "%?"
-        ;;  :file-name "%<%Y%m%d%H%M%S>-${slug}"
-        ;;  :head "#+title: ${title}"
+        ;; ("s" "Meeting" plain "%?"
+        ;;  ;; :target (file+olp "confluent/${customer-slug}/${customer-slug}.org" ("Meetings" "%<%Y-%m-%d-%H:%M> ${title}"))
+        ;;  :target (file+olp vic/pick-customer-file ("Meetings" "%<%Y-%m-%d-%H:%M> ${title}"))
+        ;;  ;; :target (file+olp "confluent/sample/sample.org" ("Meetings" "%<%Y-%m-%d-%H:%M> ${title}"))
         ;;  :unnarrowed t
-        ;;  :immediate-finish t)
-        ("c" "Customer" plain "%?"
-         :target (file+head "confluent/${slug}/${slug}.org" "#+title: ${title}\n#+filetags :customer:\n\n * Use Cases\n* Architecture\n* Meetings\n")
+        ;;  :clock-in t
+        ;;  )
+        ("s" "Customer meeting" plain "%?"
+         :if-new (file+head+olp "confluent/${slug}/${slug}.org" "#+title: ${title}\n#+filetags: :customer:\n\n* Use Cases\n* Architecture\n" ("Meetings" "%<%Y-%m-%d-%H:%M> ${Meeting title}"))
          ;; :file-name "confluent/${slug}/${slug}"
          ;; :head "#+title: ${title}"
          :unnarrowed t
-         :immediate-finish t)
+         :clock-in t
+         )
+        ("c" "Customer" plain "%?"
+         :target (file+head "confluent/${slug}/${slug}.org" "#+title: ${title}\n#+filetags: :customer:\n\n* Use Cases\n* Architecture\n* Meetings\n")
+         ;; :file-name "confluent/${slug}/${slug}"
+         ;; :head "#+title: ${title}"
+         :unnarrowed t
+         :immediate-finish t
+         )
         ("d" "draft" plain "%?"
          :if-new
          (file+head "drafts/${title}.org" "#+title: ${title}\n#+filetags: :draft:\n")
@@ -379,6 +408,8 @@ I prefer to keep the =org-roam= buffer as a /sidebar/, it is a regular window th
 #+RESULTS:
 | m | main | plain | %? | :if-new | (file+head main/${slug}.org #+title: ${title} |
 *** Consult org roam
+~consult-org-roam~ is handy to search your notes, specially to ripgrep your way out. However the preview is a bit intrusive for my taste, so I added a =0.8s= delay for some specific command, and enabled manual preview for ~org-roam-node-insert~ since very likely I won't need preview there.
+
 #+begin_src elisp
 (use-package! consult-org-roam
   :ensure t
@@ -386,6 +417,17 @@ I prefer to keep the =org-roam= buffer as a /sidebar/, it is a regular window th
   :init
   (require 'consult-org-roam)
   (consult-org-roam-mode 1)
+  ;; previewed with delay
+  (consult-customize
+   consult-org-roam-search
+   org-roam-node-find
+   :preview-key '(:debounce 0.8 any))
+  
+  ;; Manual preview
+  (consult-customize
+   org-roam-node-insert
+   :preview-key "C-SPC")
+
   :custom
   (consult-org-roam-grep-func #'consult-ripgrep))
 #+end_src
@@ -447,14 +489,3 @@ Refereces:
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-
-thi
-
-
-asafetida
-
-
-This happen also here? I don't know
-
-This also  happens here? because I can't see it. I so
-We add the configuration to the list and include it in ~org-mode-hook~ so it is set when opening org mode files. The reason to not trying to match all org files is because that way, help pages (which are typically org files as well) also to be displayed as a vertical split. and als this continues to happ but I don't know

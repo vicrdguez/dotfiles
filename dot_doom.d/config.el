@@ -1,16 +1,16 @@
 (load-file "~/.doom.d/utils.el")
-
 (setq user-full-name "Victor Rodriguez"
       user-mail-address "vrodriguez@confluent.io"
       ;; Makes sure that weekdays in the timestamps of org-mode files and the agenda appear in English
       system-time-locale "C")
-;; (setq ns-auto-hide-menu-bar t)
 
 (setq-default fill-column 120)
 
 (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)
 
 (add-hook 'window-configuration-change-hook #'vic/auto-balance-windows)
+
+(add-hook 'after-save-hook #'vic/chezmoi-re-add-on-save)
 
 (setq vic/org-dir "~/dev/braindump/")
 
@@ -33,11 +33,13 @@
     '(bar matches buffer-info remote-host buffer-position parrot selection-info)
     '(misc-info minor-modes lsp checker input-method buffer-encoding major-mode process vcs "  "))) ; <-- added padding here
 
-(after! org
-  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
-  ;; (setq org-superstar-remove-leading-stars t
-    (setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")
-          org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+;; (after! org
+;;   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+;;   ;; (setq org-superstar-remove-leading-stars t
+;;     (setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")
+;;           org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+(with-eval-after-load 'org (global-org-modern-mode))
 
 (custom-set-faces
   '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
@@ -49,7 +51,7 @@
 
 (setq org-list-indent-offset 2)
 
-(setq doom-theme 'doom-horizon)
+(setq doom-theme 'doom-gruvbox)
 
  (set-frame-parameter (selected-frame)'alpha '(95 . 95))
  (add-to-list 'default-frame-alist'(alpha . (95 . 95)))
@@ -75,7 +77,9 @@
 
 (after! org (setq org-pretty-entities t
                   org-hide-emphasis-markers t)
-  ;; (setf (alist-get 'file org-link-frame-setup) #'vic/find-file-evil-vsplit)
+  (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
+  (setq split-height-threshold nil)
+  (setq split-width-threshold 0)
   ;; hooks
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
   (add-hook 'org-mode-hook 'org-appear-mode)
@@ -86,7 +90,7 @@
         "C-j" #'org-next-visible-heading))
 
 (add-hook 'org-mode-hook (lambda ()
-                           (setq visual-fill-column-center-text t)))
+                           (setq visual-fill-column-center-text nil)))
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -99,6 +103,17 @@
                      (window-width . 0.33)
                      (preserve-size . (t . nil)))
                     ))))
+
+(defvar vic/org-electric-pairs '((?~ . ?~) (?/ . ?/) (?= . ?=)) "Electric pairs for org-mode.")
+
+(defun org-add-electric-pairs ()
+  (electric-pair-mode  1)
+  (setq-local electric-pair-pairs (append electric-pair-pairs vic/org-electric-pairs))
+  (setq-local electric-pair-text-pairs electric-pair-pairs))
+
+(add-hook 'org-mode-hook 'org-add-electric-pairs)
+
+(add-hook 'org-mode-hook 'org-fragtog-mode)
 
 (use-package! org-appear
   :after org
@@ -134,16 +149,9 @@
   (global-set-key (kbd "C-c i") #'org-roam-node-insert)
   ;; (define-key map (kbd "C-c i") 'org-roam-node-insert)
   (setq org-roam-directory vic/org-dir
-        org-roam-node-display-template (format "%s ${doom-hierarchy:*} %s"
-                                               (propertize "${doom-tags:20}" 'face 'org-tag)
-                                               (propertize "${doom-type:12}" 'face 'font-lock-keyword-face)))
-  ;; (add-to-list 'display-buffer-alist
-  ;;            '(("^\\*org-roam\\*"
-  ;;               (display-buffer-in-direction)
-  ;;               (direction . right)
-  ;;               (window-width . 0.33)
-  ;;               (window-height . fit-window-to-buffer))))
-  )
+        org-roam-node-display-template (format "%s %s ${doom-hierarchy-alias:*} ${backlinkscount}"
+                                               (propertize "${doom-type:10}" 'face 'font-lock-keyword-face)
+                                               (propertize "${doom-tags:20}" 'face 'org-tag))))
 
 (after! org-roam
   (set-popup-rules!
@@ -161,19 +169,30 @@
          :unnarrowed t)
         ("r" "reference" plain "%?"
          :if-new
-         (file+head "reference/${title}.org" "#+title: ${title}\n#+filetags: :reference:")
+         (file+head "refs/${title}.org" "#+title: ${title}\n#+filetags: :reference:")
          :immediate-finish t
          :unnarrowed t)
-        ;; ("m" "Meeting" plain "%?"
-        ;;  :file-name "%<%Y%m%d%H%M%S>-${slug}"
-        ;;  :head "#+title: ${title}"
+        ;; ("s" "Meeting" plain "%?"
+        ;;  ;; :target (file+olp "confluent/${customer-slug}/${customer-slug}.org" ("Meetings" "%<%Y-%m-%d-%H:%M> ${title}"))
+        ;;  :target (file+olp vic/pick-customer-file ("Meetings" "%<%Y-%m-%d-%H:%M> ${title}"))
+        ;;  ;; :target (file+olp "confluent/sample/sample.org" ("Meetings" "%<%Y-%m-%d-%H:%M> ${title}"))
         ;;  :unnarrowed t
-        ;;  :immediate-finish t)
-        ;; ("c" "Customer" plain "%?"
-        ;;  :file-name "${slug}"
-        ;;  :head "#+title: ${title}"
-        ;;  :unnarrowed t
-        ;;  :immediate-finish t)
+        ;;  :clock-in t
+        ;;  )
+        ("s" "Customer meeting" plain "%?"
+         :if-new (file+head+olp "confluent/${slug}/${slug}.org" "#+title: ${title}\n#+filetags: :customer:\n\n* Use Cases\n* Architecture\n" ("Meetings" "%<%Y-%m-%d-%H:%M> ${Meeting title}"))
+         ;; :file-name "confluent/${slug}/${slug}"
+         ;; :head "#+title: ${title}"
+         :unnarrowed t
+         :clock-in t
+         )
+        ("c" "Customer" plain "%?"
+         :target (file+head "confluent/${slug}/${slug}.org" "#+title: ${title}\n#+filetags: :customer:\n\n* Use Cases\n* Architecture\n* Meetings\n")
+         ;; :file-name "confluent/${slug}/${slug}"
+         ;; :head "#+title: ${title}"
+         :unnarrowed t
+         :immediate-finish t
+         )
         ("d" "draft" plain "%?"
          :if-new
          (file+head "drafts/${title}.org" "#+title: ${title}\n#+filetags: :draft:\n")
@@ -186,6 +205,17 @@
   :init
   (require 'consult-org-roam)
   (consult-org-roam-mode 1)
+  ;; previewed with delay
+  (consult-customize
+   consult-org-roam-search
+   org-roam-node-find
+   :preview-key '(:debounce 0.8 any))
+  
+  ;; Manual preview
+  (consult-customize
+   org-roam-node-insert
+   :preview-key "C-SPC")
+
   :custom
   (consult-org-roam-grep-func #'consult-ripgrep))
 

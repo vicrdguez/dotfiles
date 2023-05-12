@@ -59,5 +59,11 @@
 (package! doct)
 (package! org-web-tools)
 (package! org-download)
-(package! consult-org-roam :disable t)
+(package! consult-org-roam)
+(package! org-modern)
+(package! org-fragtog)
+;; (package! quelpa)
 ;; (package! dired-open)
+
+(package! md-roam
+  :recipe (:host github :repo "nobiot/md-roam"))
