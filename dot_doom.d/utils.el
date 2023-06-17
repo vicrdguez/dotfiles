@@ -16,11 +16,19 @@ make emacs freez when balanced or give other problems.
 worked"
 ;; (and (boundp which-key--buffer)
 ;;                    (member (get-buffer-window (bound-and-true-p which-key--buffer)) (window-list)))
-  (unless (seq-some (lambda (pattern) (string-match-p pattern (buffer-name (current-buffer))))
-                        vic/auto-balance-exclude-list)
-    (balance-windows (window-parent))
-    ;; (message "Current buffer name: %s" (buffer-name (current-buffer)))
-    ))
+  (let* ((buff (buffer-name (current-buffer)))
+         (win (get-buffer-window buff)))
+
+    (unless (or
+             (not (windowp win))
+             (and (windowp win)
+                (+popup-buffer-p win))
+             (seq-some (lambda (pattern) (string-match-p pattern (buffer-name (current-buffer))))
+                       vic/auto-balance-exclude-list))
+
+      (balance-windows (window-parent))
+      ;; (message "Current buffer name: %s" (buffer-name (current-buffer)))
+      )))
 
 (defun vic/chezmoi-re-add-on-save ()
   "Runs `chezmoi add ' for `doom-user-dir' when any of the files in it is changed, so the doom user config gets tracked
@@ -147,6 +155,19 @@ for alias nodes"
                         ("_$" . "")))                   ;; remove ending underscore
                (slug (-reduce-from #'cl-replace (strip-nonspacing-marks title) pairs)))
           (downcase slug))))))
+
+(defun vic/get-url-title (url &optional desc)
+  "Takes a URL and returns the value of the <title> HTML tag,
+   Thanks to https://frozenlock.org/tag/url-retrieve/ for documenting url-retrieve
+Based on https://gist.github.com/jmn/34cd4205fa30ccf83f94cb1bc0198f3f"
+  (let ((buffer (url-retrieve-synchronously url))
+        (title nil))
+    (with-current-buffer buffer
+      (goto-char (point-min))
+      (search-forward-regexp "<title>\\([^<]+?\\)</title>")
+      (setq title (match-string 1 ) )
+      (kill-buffer (current-buffer)))
+    title))
 
 
 (provide 'vic-utils)

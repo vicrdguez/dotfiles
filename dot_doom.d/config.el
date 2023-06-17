@@ -12,7 +12,7 @@
 
 (add-hook 'after-save-hook #'vic/chezmoi-re-add-on-save)
 
-(setq vic/org-dir "~/dev/braindump/")
+(setq vic/org-dir "~/dev/braindump-org/")
 
 (require 'package)
 
@@ -21,6 +21,11 @@
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (setq vterm-shell "fish")
+
+(map! :map 'override
+      :leader
+      :desc "M-x" ";" #'execute-extended-command
+      :desc "Eval expression" ":" #'pp-eval-expression)
 
 (setq display-line-numbers-type 'relative)
 
@@ -32,6 +37,15 @@
   (doom-modeline-def-modeline 'main
     '(bar matches buffer-info remote-host buffer-position parrot selection-info)
     '(misc-info minor-modes lsp checker input-method buffer-encoding major-mode process vcs "  "))) ; <-- added padding here
+
+(setq doom-theme 'doom-gruvbox)
+(setq! doom-gruvbox-dark-variant "hard")
+;; (setq catppuccin-flavor 'mocha) ;; or 'latte, 'macchiato, or 'mocha
+;; (load-theme 'catppuccin t t)
+;; (catppuccin-reload)
+
+ (set-frame-parameter (selected-frame)'alpha '(95 . 95))
+ (add-to-list 'default-frame-alist'(alpha . (95 . 95)))
 
 ;; (after! org
 ;;   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
@@ -47,14 +61,34 @@
   '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
   '(org-level-4 ((t (:inherit outline-4 :height 1.2))))
   '(org-level-5 ((t (:inherit outline-5 :height 1.2))))
+  '(org-document-title ((t (:inherit document-title :height 1.4))))
 )
 
 (setq org-list-indent-offset 2)
 
-(setq doom-theme 'doom-gruvbox)
+;; (setq! org-modern-list '(("+" . "◦")
+;;                          ("-" . "◦")
+;;                          ("*" . "•")))
+(setq! org-modern-list '((43 . "◦")     ;; "+"
+                         (45 . "◦")     ;; "-"
+                         (42 . "•")))   ;; "*"
 
- (set-frame-parameter (selected-frame)'alpha '(95 . 95))
- (add-to-list 'default-frame-alist'(alpha . (95 . 95)))
+;; (add-to-list 'org-emphasis-alist
+;;              '("*" (:foreground "magenta" :weight extra-bold)))
+
+(custom-set-faces
+ `(org-verbatim ((t (:inherit 'italic :foreground ,(doom-color 'dark-yellow))))))
+
+(setq org-emphasis-alist
+      '(("*" (:foreground "#d3869b" :weight bold)) ;,(doom-color 'violet)
+      ;; '(("*" (:foreground ,(doom-color 'violet) :weight bold))
+        ;; ("*" bold)
+         ("/" italic)
+         ("_" underline)
+         ("=" org-verbatim verbatim)
+         ("~" org-code verbatim)
+         ("+"
+          (:strike-through t))))
 
 (evil-define-key 'normal dired-mode-map
   (kbd "h") 'dired-up-directory
@@ -67,11 +101,25 @@
 
 (setq dired-listing-switches "--group-directories-first -al")
 
-(use-package deft
-  :init
-  (setq deft-directory vic/org-dir)
-  (setq deft-extensions '("org"))
-  (setq deft-recursive t))
+;; (use-package deft
+;;   :init
+;;   (setq deft-directory vic/org-dir)
+;;   (setq deft-extensions '("org"))
+;;   (setq deft-recursive t))
+
+(use-package! company
+  :config
+  (setq company-tooltip-limit 10
+        company-tooltip-minimum-width 30
+        company-minimum-prefix-length 2
+        company-box-doc-enable t
+        company-box-scrollbar nil
+        company-idle-delay 0.2))
+
+(map! :after vertico
+ :when (modulep! :editor evil +everywhere)
+        :map vertico-map
+        "C-<return>" #'vertico-exit-input)
 
 (setq org-directory vic/org-dir)
 
@@ -80,6 +128,9 @@
   (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
   (setq split-height-threshold nil)
   (setq split-width-threshold 0)
+  (setq org-indent-indentation-per-level 4)
+  (setq org-export-with-toc nil)
+  (setq org-link-make-description-function 'vic/get-url-title)
   ;; hooks
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
   (add-hook 'org-mode-hook 'org-appear-mode)
@@ -90,7 +141,9 @@
         "C-j" #'org-next-visible-heading))
 
 (add-hook 'org-mode-hook (lambda ()
-                           (setq visual-fill-column-center-text nil)))
+                           (setq visual-fill-column-center-text nil)
+                           (setq visual-fill-column-enable-sensible-window-split t)
+                           (setq visual-fill-column-width 120)))
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -104,12 +157,18 @@
                      (preserve-size . (t . nil)))
                     ))))
 
-(defvar vic/org-electric-pairs '((?~ . ?~) (?/ . ?/) (?= . ?=)) "Electric pairs for org-mode.")
+(defvar vic/org-electric-pairs '((?~ . ?~)) "Electric pairs for org-mode.")
 
 (defun org-add-electric-pairs ()
   (electric-pair-mode  1)
-  (setq-local electric-pair-pairs (append electric-pair-pairs vic/org-electric-pairs))
-  (setq-local electric-pair-text-pairs electric-pair-pairs))
+  (setq! electric-pair-pairs nil)
+  (setq! electric-pair-text-pairs nil)
+  (setq! electric-pair-pairs '((?~ . ?~)))
+  (setq! electric-pair-text-pairs (delq '(?\< . ?\>) electric-pair-pairs))
+  (setq-local electric-pair-inhibit-predicate
+              `(lambda (c)
+                 (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))
+  )
 
 (add-hook 'org-mode-hook 'org-add-electric-pairs)
 
@@ -127,14 +186,17 @@
         :prefix ("r" . "roam")
         ;; :desc "insert" "i" #'org-roam-insert
         :desc "Show graph" "g" #'org-roam-graph
-        :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
+        :desc "Find backlinks" "b" #'consult-org-roam-backlinks
+        :desc "Search in Org Roam nodes" "s" #'consult-org-roam-search
         :desc "Org Roam Capture" "c" #'org-roam-capture
         :desc "Org Roam" "r" #'org-roam-buffer-toggle
         ;; :desc "Find node" "f" #'dendroam-node-find-initial-input
         :desc "Find node" "f" #'org-roam-node-find
         :desc "Insert node link" "i" #'org-roam-node-insert
         :desc "Insert (skipping capture)" "I" #'org-roam-insert-immediate
-        :desc "Capture in today's daily" "C" #'org-roam-dailies-capture-today
+        :desc "Capture in today's daily" "t" #'org-roam-dailies-capture-today
+        :desc "Take screenshot and insert at point" "," #'org-download-screenshot
+        :desc "Insert clipboard image at point" "." #'org-download-clipboard
         (:prefix ("d" . "Open By date")
          :desc "Arbitrary date" "d" #'org-roam-dailies-find-date
          :desc "Tomorrow" "m" #'org-roam-dailies-find-tomorrow
@@ -149,6 +211,7 @@
   (global-set-key (kbd "C-c i") #'org-roam-node-insert)
   ;; (define-key map (kbd "C-c i") 'org-roam-node-insert)
   (setq org-roam-directory vic/org-dir
+        org-roam-completion-everywhere nil
         org-roam-node-display-template (format "%s %s ${doom-hierarchy-alias:*} ${backlinkscount}"
                                                (propertize "${doom-type:10}" 'face 'font-lock-keyword-face)
                                                (propertize "${doom-tags:20}" 'face 'org-tag))))
@@ -193,11 +256,31 @@
          :unnarrowed t
          :immediate-finish t
          )
+        ("p" "Project" plain "%?"
+         :if-new (file+head "projects/${slug}.org" "#+title: ${title}\n#+filetags: :project:\n\n")
+         ;; :file-name "confluent/${slug}/${slug}"
+         ;; :head "#+title: ${title}"
+         :unnarrowed t
+         :immediate-finish t
+         )
         ("d" "draft" plain "%?"
          :if-new
          (file+head "drafts/${title}.org" "#+title: ${title}\n#+filetags: :draft:\n")
          :immediate-finish t
          :unnarrowed t)))
+
+(setq org-roam-dailies-directory (concat vic/org-dir "log/daily"))
+
+(use-package! websocket
+  :after org-roam)
+
+(use-package! org-roam-ui
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
 
 (use-package! consult-org-roam
   :ensure t
@@ -219,9 +302,27 @@
   :custom
   (consult-org-roam-grep-func #'consult-ripgrep))
 
+(use-package! org-download
+  :ensure t
+  :init
+  (with-eval-after-load 'org
+    (org-download-enable))
+  :config
+  (setq-default org-download-image-dir (concat vic/org-dir "_meta/assets/"))
+  (setq org-download-screenshot-method "screencapture -i %s"
+        org-download-heading-lvl nil
+        org-download-method 'directory)
+  (setq org-image-actual-width 720)
+  :hook (dired-mode . org-download-enable))
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
    (shell . t)))
 
 (setq lsp-bash-highlight-parsing-errors t)
+
+(after! evil
+  (map! (:map evil-window-map
+         "v" #'+evil/window-vsplit-and-follow
+         "s" #'+evil/window-split-and-follow)))

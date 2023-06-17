@@ -50,6 +50,8 @@
 ;(unpin! t)
 
 (unpin! org-roam)
+(package! org-roam-ui)
+(package! websocket)
 
 (package! org-superstar)
 (package! org-appear)
@@ -62,6 +64,7 @@
 (package! consult-org-roam)
 (package! org-modern)
 (package! org-fragtog)
+(package! ox-gfm)
 ;; (package! quelpa)
 ;; (package! dired-open)
 

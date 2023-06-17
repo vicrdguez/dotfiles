@@ -46,13 +46,13 @@ With ~evil-respect-visual-line-mode~ vim ~j~ and ~k~ keys use visual lines, so w
 I put some vars here that I need since the beginning of the config so there is no conflicts trying to set a variable with another that is not set yet
 
 #+begin_src elisp
-(setq vic/org-dir "~/dev/braindump/")
+(setq vic/org-dir "~/dev/braindump-org/")
 #+end_src
 
 #+RESULTS:
-: ~/dev/braindump/
+: ~/dev/braindump-org/
 
-** Package config
+** Package sources
 Configuring package sources
 
 #+begin_src elisp
@@ -72,6 +72,19 @@ Use fish as the shell with ~vterm~
 
 #+RESULTS:
 : fish
+
+** General bindings
+I use =M-x= much more than =Eval=, so I want to swap their keybindings, since =<space>;= is easier to press
+
+#+begin_src elisp
+(map! :map 'override
+      :leader
+      :desc "M-x" ";" #'execute-extended-command
+      :desc "Eval expression" ":" #'pp-eval-expression)
+#+end_src
+
+#+RESULTS:
+: pp-eval-expression
 
 * UI
 ** Line numbers
@@ -118,8 +131,28 @@ Add padding to the modeline so the display is not cut off the screen
 #+RESULTS:
 : doom-modeline-format--main
 
-** Org mode stylling
+** Theme
+#+begin_src elisp
+(setq doom-theme 'doom-gruvbox)
+(setq! doom-gruvbox-dark-variant "hard")
+;; (setq catppuccin-flavor 'mocha) ;; or 'latte, 'macchiato, or 'mocha
+;; (load-theme 'catppuccin t t)
+;; (catppuccin-reload)
+#+end_src
 
+#+RESULTS:
+
+Configuring transparency to 95%
+
+#+begin_src elisp
+ (set-frame-parameter (selected-frame)'alpha '(95 . 95))
+ (add-to-list 'default-frame-alist'(alpha . (95 . 95)))
+#+end_src
+
+#+RESULTS:
+: ((alpha 95 . 95) (buffer-predicate . doom-buffer-frame-predicate) (right-divider-width . 1) (bottom-divider-width . 1) (vertical-scroll-bars) (tool-bar-lines . 0) (menu-bar-lines . 0) (left-fringe . 8) (right-fringe . 8))
+
+** Org mode stylling
 ~org-modern-mode~ prettyfies org-mode a lot. I enable it globaly. The bullet star icons are modified by custom in [[file:custom.el::(custom-set-variables][custom.el]]
 
 #+begin_src elisp
@@ -144,6 +177,7 @@ Change heading font size to make it bigger
   '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
   '(org-level-4 ((t (:inherit outline-4 :height 1.2))))
   '(org-level-5 ((t (:inherit outline-5 :height 1.2))))
+  '(org-document-title ((t (:inherit document-title :height 1.4))))
 )
 #+end_src
 
@@ -158,23 +192,46 @@ Increase plain list indent so they are easier to read
 #+RESULTS:
 : 2
 
-** Theme
+Let's prettify the unordered lists, so hyphens are not just hyphens:
+
 #+begin_src elisp
-(setq doom-theme 'doom-gruvbox)
+;; (setq! org-modern-list '(("+" . "◦")
+;;                          ("-" . "◦")
+;;                          ("*" . "•")))
+(setq! org-modern-list '((43 . "◦")     ;; "+"
+                         (45 . "◦")     ;; "-"
+                         (42 . "•")))   ;; "*"
 #+end_src
 
 #+RESULTS:
-: doom-gruvbox
 
-Configuring transparency to 95%
+Changing weight an color of org emphasis. *Bold* and =verbatim= in specific
 
 #+begin_src elisp
- (set-frame-parameter (selected-frame)'alpha '(95 . 95))
- (add-to-list 'default-frame-alist'(alpha . (95 . 95)))
-#+end_src
+;; (add-to-list 'org-emphasis-alist
+;;              '("*" (:foreground "magenta" :weight extra-bold)))
+
+(custom-set-faces
+ `(org-verbatim ((t (:inherit 'italic :foreground ,(doom-color 'dark-yellow))))))
+
+(setq org-emphasis-alist
+      '(("*" (:foreground "#d3869b" :weight bold)) ;,(doom-color 'violet)
+      ;; '(("*" (:foreground ,(doom-color 'violet) :weight bold))
+        ;; ("*" bold)
+         ("/" italic)
+         ("_" underline)
+         ("=" org-verbatim verbatim)
+         ("~" org-code verbatim)
+         ("+"
+          (:strike-through t))))
+             #+end_src
 
 #+RESULTS:
-: ((alpha 95 . 95) (buffer-predicate . doom-buffer-frame-predicate) (right-divider-width . 1) (bottom-divider-width . 1) (vertical-scroll-bars) (tool-bar-lines . 0) (menu-bar-lines . 0) (left-fringe . 8) (right-fringe . 8))
+| * | (:foreground #d3869b :weight bold) |          |
+| _ | underline                          |          |
+| = | org-verbatim                       | verbatim |
+| ~ | org-code                           | verbatim |
+| + | (:strike-through t)                |          |
 
 * File browsing
 ** Dired
@@ -208,15 +265,44 @@ For me is more confortable to have the directories listed before the files. This
 This package config is simple, I just need to specify my org-directory (since I'll be using =deft= just for my org mode notes).
 
 #+begin_src elisp
-(use-package deft
-  :init
-  (setq deft-directory vic/org-dir)
-  (setq deft-extensions '("org"))
-  (setq deft-recursive t))
+;; (use-package deft
+;;   :init
+;;   (setq deft-directory vic/org-dir)
+;;   (setq deft-extensions '("org"))
+;;   (setq deft-recursive t))
 #+end_src
 
 #+RESULTS:
 : deft
+* Completions
+** Company
+#+begin_src elisp
+(use-package! company
+  :config
+  (setq company-tooltip-limit 10
+        company-tooltip-minimum-width 30
+        company-minimum-prefix-length 2
+        company-box-doc-enable t
+        company-box-scrollbar nil
+        company-idle-delay 0.3))
+#+end_src
+
+#+RESULTS:
+: t
+
+** Vertico
+At some point, you want to complete the =vertico= selection with the current input, but without selecting any of the candidates. This is a problem because the is alway a selected candidate. Thus if you input =hell= its is going to match and select say, =hello=, when you hit ~RET~. You can exit the completion with the input's content (~vertico-exit-input~) using the keybind ~M-RET~ however using ~M~ is not comfortable for me due to the custom layout of my keyboard.
+
+For that reason I want to map ~vertico-exit-input~ to ~C-RET~ instead. The nasty surprise it that it won't work, apparently because ~C-RET~ won't behave as one may think. I need to bind it to ~C-<return>~  instead. This [[https://emacs.stackexchange.com/a/29776][answer on StackExchange]] gave me the solution.
+
+#+begin_src elisp
+(map! :after vertico
+ :when (modulep! :editor evil +everywhere)
+        :map vertico-map
+        "C-<return>" #'vertico-exit-input)
+#+end_src
+
+#+RESULTS:
 
 * Org mode
 This config aims to make using org mode more pleasant for writing. The interesting bits are:
@@ -232,6 +318,9 @@ This config aims to make using org mode more pleasant for writing. The interesti
   (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
   (setq split-height-threshold nil)
   (setq split-width-threshold 0)
+  (setq org-indent-indentation-per-level 4)
+  (setq org-export-with-toc nil)
+  (setq org-link-make-description-function 'vic/get-url-title)
   ;; hooks
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
   (add-hook 'org-mode-hook 'org-appear-mode)
@@ -272,18 +361,27 @@ We add the configuration to the list and include it in ~org-mode-hook~ so it is 
                     ))))
 #+end_src
 
-I want also to auto pair tildes (~~~) for inline code. This should make the trick by using and enabling 
+I want also to auto pair tildes (~~~) for inline code. This should make the trick by using and enabling, but had to go hacky since I was not able to set just the tilde though. This [[https://stackoverflow.com/questions/69655134/emacs-electric-pair-mode-disable-specific-pairs][SO answer]] helped a lot.
 
 #+begin_src elisp
-(defvar vic/org-electric-pairs '((?~ . ?~) (?/ . ?/) (?= . ?=)) "Electric pairs for org-mode.")
+(defvar vic/org-electric-pairs '((?~ . ?~)) "Electric pairs for org-mode.")
 
 (defun org-add-electric-pairs ()
   (electric-pair-mode  1)
-  (setq-local electric-pair-pairs (append electric-pair-pairs vic/org-electric-pairs))
-  (setq-local electric-pair-text-pairs electric-pair-pairs))
+  (setq! electric-pair-pairs nil)
+  (setq! electric-pair-text-pairs nil)
+  (setq! electric-pair-pairs '((?~ . ?~)))
+  (setq! electric-pair-text-pairs (delq '(?\< . ?\>) electric-pair-pairs))
+  (setq-local electric-pair-inhibit-predicate
+              `(lambda (c)
+                 (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))
+  )
 
 (add-hook 'org-mode-hook 'org-add-electric-pairs)
 #+end_src
+
+#+RESULTS:
+| er/add-org-mode-expansions | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | (closure ((hook . org-mode-hook) (--dolist-tail--) t) (&rest _) (add-hook 'before-save-hook 'org-encrypt-entries nil t)) | org-appear-mode | +lookup--init-org-mode-handlers-h | (closure ((hook . org-mode-hook) (--dolist-tail--) t) (&rest _) (add-hook 'before-save-hook 'org-encrypt-entries nil t)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | org-fragtog-mode | org-add-electric-pairs | (lambda nil (add-to-list 'display-buffer-alist '((\`\*Org-roam\*\*\[[^]]+\]\*\' (display-buffer-in-side-window) (side . right) (slot . -1) (window-width . 0.33) (preserve-size t))))) | (lambda nil (setq visual-fill-column-center-text nil) (setq visual-fill-column-enable-sensible-window-split t) (setq visual-fill-column-width 170)) | doom-disable-show-paren-mode-h | doom-disable-show-trailing-whitespace-h | +org-make-last-point-visible-h | evil-org-mode | toc-org-enable | embrace-org-mode-hook | org-eldoc-load |
 
 Enabling Latex inline preview:
 
@@ -292,7 +390,6 @@ Enabling Latex inline preview:
 #+end_src
 
 #+RESULTS:
-
 
 ** Org appear
 Org is not able to look show and hide emphasis markers dynamically (e.g. showing the markers just when the cursor is on a marked region like Obsidian). Using ~org-appear~ helps with this so it works as expected.
@@ -321,14 +418,17 @@ Package config and bindings
         :prefix ("r" . "roam")
         ;; :desc "insert" "i" #'org-roam-insert
         :desc "Show graph" "g" #'org-roam-graph
-        :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
+        :desc "Find backlinks" "b" #'consult-org-roam-backlinks
+        :desc "Search in Org Roam nodes" "s" #'consult-org-roam-search
         :desc "Org Roam Capture" "c" #'org-roam-capture
         :desc "Org Roam" "r" #'org-roam-buffer-toggle
         ;; :desc "Find node" "f" #'dendroam-node-find-initial-input
         :desc "Find node" "f" #'org-roam-node-find
         :desc "Insert node link" "i" #'org-roam-node-insert
         :desc "Insert (skipping capture)" "I" #'org-roam-insert-immediate
-        :desc "Capture in today's daily" "C" #'org-roam-dailies-capture-today
+        :desc "Capture in today's daily" "t" #'org-roam-dailies-capture-today
+        :desc "Take screenshot and insert at point" "," #'org-download-screenshot
+        :desc "Insert clipboard image at point" "." #'org-download-clipboard
         (:prefix ("d" . "Open By date")
          :desc "Arbitrary date" "d" #'org-roam-dailies-find-date
          :desc "Tomorrow" "m" #'org-roam-dailies-find-tomorrow
@@ -343,6 +443,7 @@ Package config and bindings
   (global-set-key (kbd "C-c i") #'org-roam-node-insert)
   ;; (define-key map (kbd "C-c i") 'org-roam-node-insert)
   (setq org-roam-directory vic/org-dir
+        org-roam-completion-everywhere nil
         org-roam-node-display-template (format "%s %s ${doom-hierarchy-alias:*} ${backlinkscount}"
                                                (propertize "${doom-type:10}" 'face 'font-lock-keyword-face)
                                                (propertize "${doom-tags:20}" 'face 'org-tag))))
@@ -398,6 +499,13 @@ I prefer to keep the =org-roam= buffer as a /sidebar/, it is a regular window th
          :unnarrowed t
          :immediate-finish t
          )
+        ("p" "Project" plain "%?"
+         :if-new (file+head "projects/${slug}.org" "#+title: ${title}\n#+filetags: :project:\n\n")
+         ;; :file-name "confluent/${slug}/${slug}"
+         ;; :head "#+title: ${title}"
+         :unnarrowed t
+         :immediate-finish t
+         )
         ("d" "draft" plain "%?"
          :if-new
          (file+head "drafts/${title}.org" "#+title: ${title}\n#+filetags: :draft:\n")
@@ -405,8 +513,31 @@ I prefer to keep the =org-roam= buffer as a /sidebar/, it is a regular window th
          :unnarrowed t)))
 #+end_src
 
+and for dailies
+
+#+begin_src elisp
+(setq org-roam-dailies-directory (concat vic/org-dir "log/daily"))
+#+end_src
+
 #+RESULTS:
-| m | main | plain | %? | :if-new | (file+head main/${slug}.org #+title: ${title} |
+: ~/dev/braindump-org/log/daily
+
+*** Org roam Ui
+This will set up the beatiful =org-roam=ui= package
+
+#+begin_src elisp
+(use-package! websocket
+  :after org-roam)
+
+(use-package! org-roam-ui
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
+#+end_src
+
 *** Consult org roam
 ~consult-org-roam~ is handy to search your notes, specially to ripgrep your way out. However the preview is a bit intrusive for my taste, so I added a =0.8s= delay for some specific command, and enabled manual preview for ~org-roam-node-insert~ since very likely I won't need preview there.
 
@@ -435,6 +566,30 @@ I prefer to keep the =org-roam= buffer as a /sidebar/, it is a regular window th
 #+RESULTS:
 : consult-org-roam
 
+** Org download
+
+Org download will allow you to paste images and take screenshots into org files. Really handy tool. In macos I'm using ~screencapture~ as the capture tool. Another dependency to paste images is ~pngpaste~.
+
+~org-image-actual-width~ makes images be displayed always at an acceptable width.
+
+#+begin_src elisp
+(use-package! org-download
+  :ensure t
+  :init
+  (with-eval-after-load 'org
+    (org-download-enable))
+  :config
+  (setq-default org-download-image-dir (concat vic/org-dir "_meta/assets/"))
+  (setq org-download-screenshot-method "screencapture -i %s"
+        org-download-heading-lvl nil
+        org-download-method 'directory)
+  (setq org-image-actual-width 720)
+  :hook (dired-mode . org-download-enable))
+#+end_src
+
+#+RESULTS:
+| org-download-enable | +dired-disable-gnu-ls-flags-maybe-h | doom--recentf-add-dired-directory-h | (lambda nil display-fill-column-indicator-mode nil) | all-the-icons-dired-mode | dired-omit-mode | diredfl-mode |
+
 ** Org Babel
 Appart from evaluating =emacs-lisp= code blocks in org mode I also want to evaluate =bash= code block evaluation so we need to add ~shell~ to the =org-babel= loaded languages.
 
@@ -455,6 +610,18 @@ Refereces:
 #+begin_src elisp
 (setq lsp-bash-highlight-parsing-errors t)
 #+end_src
+
+* Evil
+Some remappings for evil:
+
+#+begin_src elisp
+(after! evil
+  (map! (:map evil-window-map
+         "v" #'+evil/window-vsplit-and-follow
+         "s" #'+evil/window-split-and-follow)))
+#+end_src
+
+#+RESULTS:
 
 * Doom package config doc
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
@@ -488,4 +655,7 @@ Refereces:
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+
+
 
