@@ -1,7 +1,12 @@
 ## Quickly restart the yabai launch agent
-ctrl + alt + cmd - r : launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
+# ctrl + alt + cmd - r : launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai" <== old one
+ctrl + alt + cmd - r : yabai --restart-service
 # Kill focused window
 alt + cmd - backspace : $(yabai -m window $(yabai -m query --windows --window | jq -re ".id") --close)
+
+# emacs everywhere
+
+alt + cmd - 0x29: emacsclient --eval "(emacs-everywhere)"
 
 # Windows
 ## Change window focus

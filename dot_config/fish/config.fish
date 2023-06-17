@@ -32,7 +32,9 @@ if status is-interactive
     set_alias
     #Configure auto-attach/exit to your likings (default is off).
     set ZELLIJ_AUTO_ATTACH true
-    set ZELLIJ_AUTO_EXIT true
+    set ZELLIJ_AUTO_EXIT false
+    set -g -x EDITOR nvim
+    set -g -x ZK_NOTEBOOK_DIR /Users/vrodriguez/dev/kb/braindump
     eval (zellij setup --generate-auto-start fish | string collect)
     #neofetch
 end
