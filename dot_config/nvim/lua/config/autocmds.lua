@@ -39,3 +39,36 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     group = augroup("YankHighlight"),
     pattern = '*',
 })
+
+
+
+-- updates managed dotfiles with chezmoi
+-- Using nested autocmds here because otherwise it was executed once per pattern for the same file
+vim.api.nvim_create_autocmd("BufWritePost", {
+    callback = function(ev)
+        require("custom.chezmoi").chezmoi_add_if_changed(ev)
+        -- if not added then
+        --     vim.api.nvim_create_autocmd("BufWritePost", {
+        --         callback = function(ev2)
+        --             chezmoi_add_if_changed(ev2)
+        --         end,
+        --         group = augroup("chezmoi_add"),
+        --         pattern = { "*.*" }
+        --     })
+        -- end
+    end,
+    group = augroup("chezmoi_add"),
+    pattern = { "*.config/*" }
+})
+
+-- applies chezmoi source state to target
+vim.api.nvim_create_autocmd("BufWritePost", {
+    callback = function(ev)
+        require("custom.chezmoi").chezmoi_apply_if_changed(ev)
+    end,
+    group = augroup("chezmoi_apply"),
+    pattern = require("custom.chezmoi").chezmoi_get_source_path() .. "/*"
+    -- pattern = "/Users/vrodriguez/.local/share/chezmoi".."/*"
+})
+--
+--
