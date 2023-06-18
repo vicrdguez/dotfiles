@@ -43,7 +43,7 @@ return {
                 end
                 -- concat both tables to get a final blocklist
                 if cursorword_blocklist.all then
-                    local blocklist = require("custom.utils").list_concat(
+                    local blocklist = require("custom.utils").list_append(
                         cursorword_blocklist[ft],
                         cursorword_blocklist.all,
                         true

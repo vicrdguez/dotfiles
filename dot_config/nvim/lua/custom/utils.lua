@@ -83,7 +83,7 @@ end
 -- if @copy is set to true, the returned table is a brand new copy, so the original t1 is not modified
 -- if any of both tables is nil or empty, the other or an empty table is returned instead
 -- See: https://stackoverflow.com/a/15278426
-function M.list_concat(t1, t2, copy)
+function M.list_append(t1, t2, copy)
     if not t1 or next(t1) == nil then
         return t2 or {}
     elseif not t2 or next(t2) == nil then
@@ -117,7 +117,7 @@ end
 --- manages the error
 ---
 --- @param mod_name string of the module to use for the execution
---- @param func name of the function to be executed
+--- @param func string name of the function to be executed
 --- @param opts table|string? to be passed to @func
 function M.run(mod_name, func, opts)
     local mod = require(mod_name)
