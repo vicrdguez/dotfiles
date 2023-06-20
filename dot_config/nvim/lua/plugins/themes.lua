@@ -1,10 +1,57 @@
 return {
     {
+        "catppuccin/nvim",
+        name = "catppuccin",
+        priority = 1000,
+        opts = {
+            flavour = "mocha",
+            dim_inactive = {
+                enabled = false,
+                percentage = 0.05
+            },
+            transparent_background = true,
+            integrations = {
+                cmp = true,
+                gitsigns = true,
+                nvimtree = true,
+                telescope = true,
+                notify = false,
+                mini = false,
+                alpha = true,
+                lsp_trouble = true,
+                treesitter = true,
+                markdown = true,
+                -- headlines = true,
+                noice = true
+            },
+            custom_highlights = function(colors)
+                return {
+                    FzfLuaTitle             = { fg = colors.mauve, bold = true },
+                    FzfLuaNormal            = { bg = colors.mantle },
+                    -- FzfLuaBorder            = { fg = colors.teal, bg = colors.crust },
+                    -- FzfLuaCursor            = { fg = colors.maroon, bg = colors.yellow },
+                    -- FzfLuaHelpNormal        = { bg = colors.overlay2 },
+                    -- FzfLuaHelpBorder        = { bg = colors.overlay2, fg = colors.lavender },
+                    -- FzfLuaCursorLine        = { bg = colors.maroon },
+                    -- FzfLuaSearch            = { bg = colors.maroon },
+                    -- FzfLuaScrollBorderEmpty = { bg = colors.maroon },
+                    -- FzfLuaScrollBorderFull  = { bg = colors.maroon },
+                    -- FzfLuaScrollFloatEmpty  = { bg = colors.maroon },
+                    -- FzfLuaScrollFloatFull   = { bg = colors.maroon },
+                    -- FzfLuaCursorLineNr      = { bg = colors.maroon },
+                    FzfLuaPreviewNormal     = { bg = colors.crust },
+                    FzfLuaPreviewBorder     = { bg = colors.mantle, fg = colors.lavender },
+                }
+            end
+        },
+    },
+
+    {
         'rebelot/kanagawa.nvim',
         lazy = false,
         opts = {
             transparent = false,
-            
+
             overrides = function(colors)
                 local theme = colors.theme
                 return {

@@ -8,7 +8,7 @@ local utils = require("custom.utils")
 
 
 local M = {
-    theme = "kanagawa-wave",
+    theme = "catppuccin",
     icons = {
         diagnostics = {
             Error = " ",
