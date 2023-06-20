@@ -1,3 +1,5 @@
+local zk = require("custom.zk").zk
+
 return {
     {
         "vicrdguez/zk-nvim",
@@ -25,9 +27,14 @@ return {
             })
         end,
         keys = {
-            { "<leader>rf", "<Cmd>ZkNotes<CR>" },
-            { "<leader>ri", "<Cmd>ZkInsertLink<CR>" },
-            { "<C-c>i",     "<Cmd>ZkInsertLink<CR>", mode = "i" },
+            { "<leader>rf", zk("ZkNotes", {}) },
+            { "<leader>rn", zk("prompt_new", {}) },
+            { "<leader>rt", zk("ZkTags", {sort = {"note-count"}}) },
+            { "<leader>rb", zk("ZkBacklinks", {}) },
+            { "<leader>rm", zk("ZkMatch", {}), mode = "v" },
+            { "<leader>ri", zk("ZkInsertLink", { matchSelected = true }) },
+            { "<leader>rI", zk("ZkInsertLinkAtSelection", { matchSelected = true }) },
+            { "<C-c>i",     zk("ZkInsertLink", { matchSelected = true }), mode = "i" },
         },
     },
     { dir = "/usr/local/opt/fzf" },
