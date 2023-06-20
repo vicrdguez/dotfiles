@@ -3,7 +3,7 @@ local M = {}
 
 --- Nice little tricks from our frind TJ
 P = function(val)
-    print("vic\n" .. vim.inspect(val))
+    print("vic\n=====\n" .. vim.inspect(val) .. "\n=====")
     return val
 end
 
@@ -13,7 +13,7 @@ end
 --
 -- end
 
-R = function (mod)
+R = function(mod)
     -- RELOAD(name)
     package.loaded[mod] = nil
     return require(mod)
@@ -68,7 +68,14 @@ function M.setColor(color)
 end
 
 function M.map(mode, lhs, rhs, opts)
-    vim.keymap.set(mode, lhs, rhs, opts)
+    local keys = require("lazy.core.handler").handlers.keys
+    ---@cast keys LazyKeysHandler
+    -- do not create the keymap if a lazy keys handler exists
+    if not keys.active[keys.parse({ lhs, mode = mode }).id] then
+        opts = opts or {}
+        opts.silent = opts.silent ~= false
+        vim.keymap.set(mode, lhs, rhs, opts)
+    end
 end
 
 function M.nmap(lhs, rhs, opts)
@@ -98,37 +105,22 @@ function M.list_append(t1, t2, copy)
     return res
 end
 
--- Maybe require the package just if necessary
--- if the package is not loaded, requires it and returns it 
--- if the package is loaded already, it just returns it 
---
--- @package the name of the package to require
-function M.mrequire(package)
-    vim.notify("in mrequire")
-    vim.notify(package)
-    if package.loaded[package] then
-        return package.loaded[package]
-    end
-    return require(package)
-end
-
---- Tries to run a function for a module and returns true if succeeds, if this function does not 
---- exist, it just returns false instead of failing with an error. It is expected that the caller 
+--- Tries to run a function for a module and returns true if succeeds, if this function does not
+--- exist, it just returns false instead of failing with an error. It is expected that the caller
 --- manages the error
 ---
 --- @param mod_name string of the module to use for the execution
 --- @param func string name of the function to be executed
 --- @param opts table|string? to be passed to @func
 function M.run(mod_name, func, opts)
-    local mod = require(mod_name)
-
-    if pcall(function()
-            mod[func](opts)
-        end) then
-        return true
+    local mod     = require(mod_name)
+    local ok, res = pcall(function()
+        return mod[func](opts)
+    end)
+    if ok then
+        return res
     end
-
-    return false
+    return nil
 end
 
 return M
