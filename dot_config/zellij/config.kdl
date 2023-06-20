@@ -122,6 +122,10 @@ keybinds clear-defaults=true {
         bind "Ctrl n" { SwitchToMode "Resize"; }
         bind "Ctrl h" { SwitchToMode "Move"; }
         bind "Ctrl g" { SwitchToMode "Locked"; }
+        bind "h" "Left" { MoveFocus "Left"; }
+        bind "l" "Right" { MoveFocus "Right"; }
+        bind "j" "Down" { MoveFocus "Down"; }
+        bind "k" "Up" { MoveFocus "Up"; }
 //        bind "Ctrl s" { Write 2; SwitchToMode "Normal"; }
 //        bind "\"" { NewPane "Down"; SwitchToMode "Normal"; }
 //        bind "%" { NewPane "Right"; SwitchToMode "Normal"; }
@@ -262,7 +266,7 @@ themes {
 // Choose the theme that is specified in the themes section.
 // Default: default
 //
-theme "kanagawa"
+theme "catppuccin-mocha"
 
 // The name of the default layout to load on startup
 // Default: "default"
