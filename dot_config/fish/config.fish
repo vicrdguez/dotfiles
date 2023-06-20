@@ -35,7 +35,9 @@ if status is-interactive
     set ZELLIJ_AUTO_EXIT false
     set -g -x EDITOR nvim
     set -g -x ZK_NOTEBOOK_DIR /Users/vrodriguez/dev/kb/braindump
+    set -g -x XDG_CONFIG_HOME /Users/vrodriguez/.config
     eval (zellij setup --generate-auto-start fish | string collect)
+    # bind \cl true
     #neofetch
 end
 
