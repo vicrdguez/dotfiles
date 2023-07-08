@@ -1,5 +1,5 @@
 local nmap = require("custom.utils").nmap
-local augroup = require("custom.utils").augroup
+-- local augroup = require("custom.utils").augroup
 
 -- Learn the keybindings, see :help lsp-zero-keybindings
 -- Learn to configure LSP servers, see :help lsp-zero-api-showcase
@@ -49,7 +49,7 @@ return {
             -- Explicitly setup neovim's lua LSP stuff
             require("lspconfig").lua_ls.setup(lspz.nvim_lua_ls())
 
-            lspz.skip_server_setup({ "jdtls" }) -- This server is configured independently. See /lsp/jdtls.lua
+            lspz.skip_server_setup({ "jdtls", "gopls" }) -- This servers is configured independently. 
             -- vim.api.nvim_create_autocmd("FileType", {
             --     group = augroup("jdtls"),
             --     pattern = { "java" },
@@ -74,6 +74,24 @@ return {
         -- keys = common_lsp_maps
     },
     {
+        "ray-x/go.nvim",
+        dependencies = { -- optional packages
+            "ray-x/guihua.lua",
+            "neovim/nvim-lspconfig",
+            "nvim-treesitter/nvim-treesitter",
+        },
+        opts = {
+            lsp_cfg = true,
+            lsp_keymaps = false
+        },
+        config = function(_, opts)
+            require("go").setup(opts)
+        end,
+        event = { "CmdlineEnter" },
+        ft = { "go", 'gomod' },
+        -- build = ':lua require("go.install").update_all_sync()' -- if you need to install/update all binaries
+    },
+    {
         "VonHeikemen/lsp-zero.nvim",
         branch = "v2.x",
         lazy = true,
@@ -81,5 +99,24 @@ return {
             -- simple setup, disabling borders
             require("lsp-zero").preset({ float_border = "none" })
         end
+    },
+    { "mfussenegger/nvim-dap" },
+    {
+        "rcarriga/nvim-dap-ui",
+        config = function()
+            local dap, dapui = require("dap"), require("dapui")
+            dapui.setup()
+            -- open dap ui automatically when debug starts
+            dap.listeners.after.event_initialized["dapui_config"] = function()
+                dapui.open()
+            end
+            -- dap.listeners.before.event_terminated["dapui_config"] = function()
+            --     dapui.close()
+            -- end
+            dap.listeners.before.event_exited["dapui_config"] = function()
+                dapui.close()
+            end
+        end,
+        enabled = true,
     },
 }

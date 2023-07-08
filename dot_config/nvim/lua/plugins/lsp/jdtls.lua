@@ -49,10 +49,16 @@ local function get_jdtls_paths(jdtls)
         vim.fn.glob(java_debug_path .. "/extension/server/com.microsoft.java.debug.plugin-*.jar"),
         "\n"
     )
+    local vscode_java_test = mason_registry.get_package("java-test"):get_install_path()
+    local vscode_java_bundle = vim.split(vim.fn.glob(vscode_java_test.."/extension/server/*.jar", true), "\n")
 
     -- add jars to the bundle list if there are any
     if java_debug_bundle[1] ~= "" then
         vim.list_extend(path.bundles, java_debug_bundle)
+    end
+
+    if vscode_java_bundle[1] ~= "" then
+        vim.list_extend(path.bundles, vscode_java_bundle)
     end
 
     path.runtimes = {
@@ -113,6 +119,7 @@ local function enable_codelens(bufnr)
 end
 
 local function enable_debugger(bufnr)
+    vim.notify("ENABLE DEBUGGER")
     require("jdtls").setup_dap({ hotcodereplace = "auto" })
     require("jdtls.dap").setup_dap_main_class_configs()
 end
@@ -166,12 +173,10 @@ M.jdtls_setup = function(event)
     }
 
 
-    vim.notify("I'M HEREEEEEEE")
     -- for _, v in ipairs(cmd) do
     --     vim.cmd("!echo '".. v .."' > my_file.txt")
     -- end
 
-    
     local lsp_settings = {
         java = {
             jdt = {
