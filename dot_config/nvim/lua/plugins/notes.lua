@@ -1,5 +1,13 @@
 local zk = require("custom.zk").zk
 
+local function get_picker()
+    if require("lazy.core.config").plugins["telescope.nvim"] then
+        if require("lazy.core.config").plugins["telescope.nvim"].enabled then
+            return "telescope"
+        end
+    end
+    return "fzf_lua"
+end
 return {
     {
         "vicrdguez/zk-nvim",
@@ -8,7 +16,8 @@ return {
             require("zk").setup({
                 -- can be "telescope", "fzf" or "select" (`vim.ui.select`)
                 -- it's recommended to use "telescope" or "fzf"
-                picker = "fzf_lua",
+                -- picker = "telescope",
+                picker = get_picker(),
                 lsp = {
                     -- `config` is passed to `vim.lsp.start_client(config)`
                     config = {
@@ -38,6 +47,7 @@ return {
         },
     },
     { dir = "/usr/local/opt/fzf" },
+    -- { dir = "/usr/local/opt/fzf" },
     {
         "ekickx/clipboard-image.nvim",
         opts = {
