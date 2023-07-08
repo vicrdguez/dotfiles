@@ -33,14 +33,14 @@ alias llg='exa -l --git-ignore --icons'
 ## goenv
 # setup shell by putting below into ~/.bash_profile (for zsh users use ~/.zshenv instead)
 # Tell goenv where the GOPATH prefix is for all go versions
-export GOENV_GOPATH_PREFIX=$HOME/git/go
+# export GOENV_GOPATH_PREFIX=$HOME/git/go
  
 # Setup and Init goenv
-export GOENV_ROOT="$HOME/.goenv"
-export PATH="$GOENV_ROOT/bin:$PATH"
+# export GOENV_ROOT="$HOME/.goenv"
+# export PATH="$GOENV_ROOT/bin:$PATH"
 #eval "$(goenv init -)"
-export PATH="$GOROOT/bin:$PATH"
-export PATH="$PATH:$GOPATH/bin"
+# export PATH="$GOROOT/bin:$PATH"
+# export PATH="$PATH:$GOPATH/bin"
 
 # This is a change
 
@@ -51,6 +51,6 @@ export PATH="$PATH:$GOPATH/bin"
 eval "$(starship init zsh)"
 
 # Fig post block. Keep at the bottom of this file.
-#source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-neofetch
+# neofetch
