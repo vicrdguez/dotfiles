@@ -25,7 +25,7 @@ symbol = " "
 symbol = " "
 #
 [lua]
-symbol = " "
+symbol = "  "
 # # format = "[  $version] (bold blue)"
 #
 [memory_usage]
