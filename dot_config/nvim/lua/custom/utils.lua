@@ -3,7 +3,9 @@ local M = {}
 
 --- Nice little tricks from our frind TJ
 P = function(val)
-    print("vic\n=====\n" .. vim.inspect(val) .. "\n=====")
+    local info = debug.getinfo(2, "Sn")
+    -- print(caller_func.."\n=====\n" .. vim.inspect(val) .. "\n=====")
+    print(string.format("%s: %s\n=====\n%s\n=====", info.short_src, info.name, vim.inspect(val)))
     return val
 end
 
@@ -121,6 +123,24 @@ function M.run(mod_name, func, opts)
         return res
     end
     return nil
+end
+
+--- Creates a folder if it does not exsist. It assumes happy path now and does not check on any 
+--- errors like creating a folder in a read only fs.
+---
+---@param dir string the directory to create 
+---@return string|boolean mkdir_out created directory or false if it already existed
+function M.maybe_mkdir(dir)
+    local output = vim.fn.system("ls " .. dir)
+    if string.find(output, "No such file") then
+        local mkdir_out = vim.fn.system("mkdir -v " .. dir)
+        if string.find(mkdir_out, "File exists") then
+            return dir
+        else
+            return mkdir_out
+        end
+    end
+    return true
 end
 
 return M
