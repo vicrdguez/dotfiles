@@ -8,16 +8,40 @@ function M.zk(command, opts)
         else
             M[command](opts)
         end
-        -- local zk_cmd = function(_opts)
-        --     run("zk.commands", "get", command)(_opts)
-        -- end
-        -- if zk_cmd then
-        --     zk_cmd(opts)
-        -- end
     end
-    -- if not run("zk.commands", command, opts) then
-    --     vim.notify("Function does not exist in zk", vim.log.levels.ERROR)
-    -- end
+end
+
+function M.find_or_create(opts, picker_opts, create_cb, pick_cb)
+    -- same exact callback as zk-nvim/lua/zk.lua
+    local def_pick_cb = function(notes)
+        if picker_opts and picker_opts.multi_select == false then
+            notes = { notes }
+        end
+        for _, note in ipairs(notes) do
+            vim.cmd("e " .. note.absPath)
+        end
+    end
+
+    -- by default we just have the option to create the note in main
+    local def_create_cb = function(_, fzf_opts)
+        local prompt_input = fzf_opts.__resume_data.last_query
+        local dir = opts.dir or "main"
+        require("zk.commands").get("ZkNew")({ title = prompt_input, dir = dir })
+    end
+
+    picker_opts = vim.tbl_extend("force", {
+        title = "Zk find",
+        fzf_lua = {
+            actions = {
+                ["ctrl-o"] = create_cb or def_create_cb
+            }
+        }
+    }, picker_opts or {})
+    -- local zk_opts = vim.tbl_extend("force", {
+    --     tags = { "-meeting" } -- avoid displaying meeting notes here, unless set otherwise in opts
+    -- }, options or {})
+
+    require("zk").pick_notes(opts, picker_opts, pick_cb or def_pick_cb)
 end
 
 function M.prompt_new(opts)
@@ -26,62 +50,103 @@ function M.prompt_new(opts)
     require("zk.commands").get("ZkNew")({ title = title, dir = dir })
 end
 
-
 function M.remove(opts)
     local fname = vim.fn.expand("%")
     local fpath = vim.fn.expand("%:p")
-    local input = vim.fn.input("Are you sure you want to remove ".. fname, "y/n")
+    local input = vim.fn.input("Are you sure you want to remove " .. fname, "y/n")
     if input == "y" then
-        vim.cmd("!rm "..fpath)
+        vim.cmd("!rm " .. fpath)
     end
 end
 
+function M.find_or_create_meeting(opts)
+    local pick_customer_cb = function(note)
+        local note_dir_path = vim.fs.dirname(note.absPath)
+        local customer_dirname = vim.fs.basename(note_dir_path)
+        local meetings_path = note_dir_path .. "/meetings/"
+        local zk_meetings_dir = "confluent/" .. customer_dirname .. "/meetings"
 
-
-
-
-function M.create_meeting(opts)
-    local zk_pick = require("zk").pick_notes
-    local zkopts = { tags = {"customer"} }
-    vim.tbl_extend("force", opts or {}, zkopts)
-    P(zkopts)
-    zk_pick(
-        zkopts,
-        {title = "Pick a customer", multi_select = false },
-        function (note)
-            P(note)
+        local create_meeting_cb = function(_, fzf_opts)
+            local zk_new_opts = {
+                dir = zk_meetings_dir,
+                title = fzf_opts.__resume_data.last_query,
+                template = "meetings.md",
+                extra = {
+                    customer_name = note.title,
+                    customer_file = vim.fs.basename(note.absPath)
+                }
+            }
+            local result = R("custom.utils").maybe_mkdir(meetings_path)
+            if result then
+                vim.notify("creating meeting")
+                require("zk.commands").get("ZkNew")(zk_new_opts)
+            end
         end
-    )
-
+        opts = vim.tbl_extend("force", {
+            hrefs = { zk_meetings_dir },
+            tags = { "meeting" }
+        }, opts or {})
+        -- find or create the meeting
+        M.find_or_create(opts, { title = "Zk Meetings" }, create_meeting_cb)
+    end
+    -- zk_pick(zkopts, { title = "Pick a customer", multi_select = false }, pick_cb)
+    M.find_or_create_customer(opts, { title = "Pick a customer", multi_select = false }, pick_customer_cb)
 end
 
-function M.create_customer(opts)
-    local zk_new = require("zk.commands").get("ZkNew")
-    local cust_name = vim.fn.input("Customer name: ")
-    local slug_name = cust_name:gsub("(%u)(%u)", "%1-%2"):lower():gsub(" ", "-")
+function M.find_or_create_customer(opts, picker_opts, pick_cb)
+    local create_cb = function(_, fzf_opts)
+        local cust_name = fzf_opts.__resume_data.last_query
+        local slug_name = cust_name:gsub("(%u)(%u)", "%1-%2"):lower():gsub(" ", "-")
 
-    local notebook_path = require("zk.util").resolve_notebook_path(0).."/"
-    local dir_name = "confluent/"..slug_name
-    local zkopts = {
-        dir = dir_name,
-        title = cust_name,
-        template = "customer.md",
-        edit = true
-    }
+        local notebook_path = vim.fn.getcwd(0)
+        -- if the cwd is not the notebook root, use the env variable as fallback
+        if not require("zk.util").notebook_root(notebook_path) then
+            notebook_path = vim.env.ZK_NOTEBOOK_DIR
+        end
 
-    local output = vim.fn.system("ls "..notebook_path..dir_name)
-    if string.find(output, "No such file") then
-        local mkdir_out = vim.fn.system("mkdir "..notebook_path..dir_name)
-        print(mkdir_out)
+        local dir_name = "confluent/" .. slug_name
+        local zkopts = {
+            dir = dir_name,
+            title = cust_name,
+            template = "customer.md",
+            edit = true
+        }
+
+        vim.tbl_extend("force", opts or {}, zkopts)
+        local result = require("custom.utils").maybe_mkdir(notebook_path .. "/" .. dir_name)
+        if result then
+            require("zk.commands").get("ZkNew")(zkopts)
+        end
     end
 
-    vim.tbl_extend("force", opts or {}, zkopts)
+    picker_opts = vim.tbl_extend("force", {
+        title = "Zk Customers",
+    }, picker_opts or {})
+    opts = vim.tbl_extend("force", {
+        tags = { "customer" }
+    }, opts or {})
 
-    zk_new(zkopts)
+    M.find_or_create(opts, picker_opts, create_cb, pick_cb)
 end
 
-vim.api.nvim_create_user_command("ZkNewCustomer", function (opts)
-    M.create_customer(opts)
-end, {desc = "Creates a new customer note in Zk"})
+vim.api.nvim_create_user_command("ZkCustomers", function(opts)
+    M.find_or_create_customer(opts)
+end, { desc = "Finds or creates a new customer note in Zk" })
+
+vim.api.nvim_create_user_command("ZkMeetings", function(opts)
+    M.find_or_create_meeting(opts)
+end, { desc = "Creates a new meeting note for a  customer creating the customer if it does not exist in Zk" })
+
+vim.api.nvim_create_user_command("ZkToday", function(_)
+    require("zk.commands").get("ZkNew")({ dir = "log/daily" })
+end, { desc = "Opens or creates Zk note for today" })
+
+vim.api.nvim_create_user_command("ZkWeek", function(_)
+    require("zk.commands").get("ZkNew")({ dir = "log/weekly" })
+end, { desc = "Opens or creates Zk note for today" })
+
+vim.api.nvim_create_user_command("ZkLog", function(_)
+    require("zk.commands").get("ZkNotes")({ hrefs = { "log" }, sort = { "created" } })
+end, { desc = "List all the Zk log notes" })
 
 return M
