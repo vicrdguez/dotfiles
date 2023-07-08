@@ -37,6 +37,11 @@ nmap("<leader>wc", "<C-w>c")
 nmap("<leader>w=", "<C-w>=")
 nmap("<leader>wf", "<C-w>|")
 
+-- nmap("<C-h>", "<cmd>ZellijNavigateLeft<cr>")
+-- nmap("<C-j>", "<cmd>ZellijNavigateDown<cr>")
+-- nmap("<C-k>", "<cmd>ZellijNavigateUp<cr>")
+-- nmap("<C-l>", "<cmd>ZellijNavigateUp<cr>")
+--
 -- Paste over selection without overriding the vim paste register with the
 -- substituted string. Doing so by yanking into the void register
 map("x", "<leader>p", [["_dP]])
