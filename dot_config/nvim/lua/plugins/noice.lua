@@ -29,7 +29,7 @@ return {
                     },
                     filter_options = {},
                     win_options = {
-                        winhighlight = "NormalFloat:NormalFloat,FloatBorder:FloatBorder",
+                        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
                     },
                     position = {
                         row = 25,

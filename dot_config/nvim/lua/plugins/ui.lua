@@ -72,44 +72,7 @@ return {
         "freddiehaddad/feline.nvim",
         lazy = false,
         -- dependencies = { "catppuccin/nvim" },
-        init = function()
-            vim.opt.termguicolors = true
-            local show_modified = true
-            local filename_icon = "󰈙"
-            local components = require("catppuccin.groups.integrations.feline").get()
-            local colors = require("catppuccin.palettes").get_palette()
-            local U = require "catppuccin.utils.colors"
-            components.active[3][3].provider = function()
-                local filename = vim.fn.pathshorten(vim.fn.expand("%:p"))
-                local extension = vim.fn.expand "%:e"
-                local present, icons = pcall(require, "nvim-web-devicons")
-                local icon = present and icons.get_icon(filename, extension) or filename_icon
-                return (show_modified and "%m" or "") .. " " .. icon .. " " .. filename .. " "
-            end
-            components.active[3][3].hl = {
-                bg = colors.mantle,
-                fg = colors.blue
-            }
-            components.active[3][3].left_sep.hl = {
-                fg = colors.mantle,
-                bg = colors.base
-            }
-            components.active[3][4].hl = {
-                bg = colors.blue,
-                fg = colors.mantle
-            }
-            components.active[3][4].left_sep.hl = {
-                bg = colors.mantle,
-                fg = colors.blue
-            }
-
-            require("feline").setup({
-                components = components,
-                sett = {
-                    curr_file = colors.mantle
-                },
-            })
-        end,
+        init = require("custom.feline").kanagawa()
     },
     {
         "goolord/alpha-nvim",

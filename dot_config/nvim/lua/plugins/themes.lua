@@ -9,6 +9,9 @@ return {
                 enabled = false,
                 percentage = 0.05
             },
+            styles = {
+                conditionals = {}
+            },
             transparent_background = true,
             integrations = {
                 cmp = true,
@@ -16,7 +19,7 @@ return {
                 nvimtree = true,
                 telescope = true,
                 notify = false,
-                mini = false,
+                mini = true,
                 alpha = true,
                 lsp_trouble = true,
                 treesitter = true,
@@ -26,21 +29,21 @@ return {
             },
             custom_highlights = function(colors)
                 return {
-                    FzfLuaTitle             = { fg = colors.mauve, bold = true },
-                    FzfLuaNormal            = { bg = colors.mantle },
-                    -- FzfLuaBorder            = { fg = colors.teal, bg = colors.crust },
-                    -- FzfLuaCursor            = { fg = colors.maroon, bg = colors.yellow },
-                    -- FzfLuaHelpNormal        = { bg = colors.overlay2 },
-                    -- FzfLuaHelpBorder        = { bg = colors.overlay2, fg = colors.lavender },
-                    -- FzfLuaCursorLine        = { bg = colors.maroon },
-                    -- FzfLuaSearch            = { bg = colors.maroon },
-                    -- FzfLuaScrollBorderEmpty = { bg = colors.maroon },
-                    -- FzfLuaScrollBorderFull  = { bg = colors.maroon },
-                    -- FzfLuaScrollFloatEmpty  = { bg = colors.maroon },
-                    -- FzfLuaScrollFloatFull   = { bg = colors.maroon },
-                    -- FzfLuaCursorLineNr      = { bg = colors.maroon },
-                    FzfLuaPreviewNormal     = { bg = colors.crust },
-                    FzfLuaPreviewBorder     = { bg = colors.mantle, fg = colors.lavender },
+                    LazyNormal             = { bg = colors.mantle },
+                    MasonNormal            = { bg = colors.mantle },
+                    NormalFloat            = { bg = colors.mantle, fg = colors.overlay1, blend = 0 },
+                    FzfLuaTitle            = { fg = colors.mauve, bold = true },
+                    FzfLuaNormal           = { bg = colors.mantle },
+                    FzfLuaPreviewNormal    = { bg = colors.crust },
+                    FzfLuaPreviewBorder    = { bg = colors.mantle, fg = colors.lavender },
+
+                    TelescopeTitle         = { bg = colors.mantle, fg = colors.blue, bold = true },
+                    TelescopePromptNormal  = { bg = colors.mantle, fg = colors.blue },
+                    TelescopeResultsNormal = { bg = colors.mantle, fg = colors.text },
+                    TelescopePromptBorder  = { bg = colors.mantle, fg = colors.mantle },
+                    TelescopeResultsBorder = { bg = colors.mantle, fg = colors.mantle },
+                    TelescopePreviewNormal = { bg = colors.crust },
+                    TelescopePreviewBorder = { bg = colors.crust, fg = colors.crust },
                 }
             end
         },
@@ -51,42 +54,65 @@ return {
         lazy = false,
         opts = {
             transparent = false,
-
+            keywordStyle = { italic = false },
             overrides = function(colors)
-                local theme = colors.theme
+                local col = colors.palette
                 return {
                     -- NormalFloat = { bg = "none" },
-                    FloatBorder = { bg = "none" },
-                    FloatTitle = { bg = "none" },
+                    FloatBorder            = { bg = "none" },
+                    FloatTitle             = { bg = "none" },
                     -- Save an hlgroup with dark background and dimmed foreground
                     -- so that you can use it where your still want darker windows.
                     -- E.g.: autocmd TermOpen * setlocal winhighlight=Normal:NormalDark
-                    -- NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
+                    -- NormalDark = { fg = col.oldWhite, bg = col.sumiInk0 },
 
                     -- more uniform colors for the popup menu
-                    -- Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 }, -- add `blend = vim.o.pumblend` to enable transparency
+                    -- Pmenu = { fg = theme.ui.shade0, bg = col.sumiInk4 }, -- add `blend = vim.o.pumblend` to enable transparency
                     -- PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
-                    -- PmenuSbar = { bg = theme.ui.bg_m1 },
+                    -- PmenuSbar              = { bg = col.sumiInk2 },
                     -- PmenuThumb = { bg = theme.ui.bg_p2 },
                     -- Popular plugins that open floats will link to NormalFloat by default;
                     -- set their background accordingly if you wish to keep them dark and borderless
-                    NormalFloat = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim, blend = 0 },
-                    LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
-                    MasonNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
-                    TelescopeTitle = { fg = theme.ui.special, bold = true },
-                    TelescopePromptNormal = { bg = theme.ui.bg_p1 },
-                    TelescopeResultsNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m1 },
-                    TelescopePromptBorder = { fg = theme.ui.bg_p1, bg = theme.ui.bg_p1 },
-                    TelescopeResultsBorder = { fg = theme.ui.bg_m1, bg = theme.ui.bg_m1 },
-                    TelescopePreviewNormal = { bg = theme.ui.bg_dim },
-                    TelescopePreviewBorder = { bg = theme.ui.bg_dim, fg = theme.ui.bg_dim },
+                    -- NormalFloat            = { bg = col.sumiInk0, fg = col.oldWhite, blend = 0 },
+                    LazyNormal             = { bg = col.sumiInk0, fg = col.oldWhite },
+                    MasonNormal            = { bg = col.sumiInk0, fg = col.oldWhite },
 
-                    FzfLuaTitle = { fg = theme.ui.special, bold = true },
-                    FzfLuaNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m1 },
-                    FzfLuaBorder = { fg = theme.ui.bg_m1, bg = theme.ui.bg_m1 },
-                    FzfLuaCursor = { bg = theme.ui.bg_p1 },
-                    FzfLuaHelpNormal = { bg = theme.ui.bg_dim },
-                    FzfLuaHelpBorder = { bg = theme.ui.bg_dim, fg = theme.ui.bg_dim },
+                    -- Diagnostics and Line number columns
+                    SignColumn             = { bg = col.sumiInk1 },
+                    LineNr                 = { bg = col.sumiInk1 },
+                    DiagnosticSignWarn     = { bg = "none" },
+                    DiagnosticSignInfo     = { bg = "none" },
+                    DiagnosticSignError    = { bg = "none" },
+                    DiagnosticSignHint     = { bg = col.sumiInk1 },
+
+                    -- trouble
+                    TroubleNormal          = { bg = col.sumiInk1 },
+                    TroubleFoldIcon        = { bg = col.sumiInk1 },
+                    TroubleLocation        = { bg = "none" },
+                    -- TroubleText     = { bg = "none" },
+                    -- NoiceCmdline      = { bg = col.sumiInk3, fg = col.sumiInk3 },
+                    NoiceCmdlineIcon       = { bg = col.sumiInk1, fg = col.dragonBlue },
+
+                    TelescopeTitle         = { bg = col.sumiInk2, fg = col.dragonBlue, bold = true },
+                    TelescopePromptNormal  = { bg = col.sumiInk2, fg = col.dragonBlue, bold = true },
+                    TelescopeResultsNormal = { bg = col.sumiInk2, fg = col.fujiWhite },
+                    TelescopePromptBorder  = { bg = col.sumiInk2, fg = col.sumiInk2 },
+                    TelescopeResultsBorder = { bg = col.sumiInk2, fg = col.sumiInk2, },
+                    TelescopePreviewNormal = { bg = col.sumiInk0 },
+                    TelescopePreviewBorder = { bg = col.sumiInk0, fg = col.sumiInk0 },
+
+                    FzfLuaTitle            = { fg = col.springViolet1, bold = true },
+                    FzfLuaNormal           = { fg = col.oldWhite, bg = col.sumiInk2 },
+                    FzfLuaBorder           = { fg = col.sumiInk2, bg = col.sumiInk2 },
+                    FzfLuaCursor           = { bg = col.sumiInk4 },
+                    FzfLuaHelpNormal       = { bg = col.sumiInk1 },
+                    FzfLuaHelpBorder       = { bg = col.sumiInk1, fg = col.sumiInk1 },
+                    FzfLuaPreviewNormal    = { bg = col.sumiInk0 },
+
+                    -- mardkdown
+                    markdownBold           = { fg = col.waveAqua2 },
+                    markdownBoldItalic     = { fg = col.waveAqua2 },
+
                 }
             end
         }
