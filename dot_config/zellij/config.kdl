@@ -116,16 +116,34 @@ keybinds clear-defaults=true {
         bind "d" { Detach; }
     }
     tmux {
+        //modes
         bind "Ctrl s" { SwitchToMode "Scroll"; }
         bind "Ctrl p" { SwitchToMode "Pane"; }
         bind "Ctrl t" { SwitchToMode "Tab"; }
         bind "Ctrl n" { SwitchToMode "Resize"; }
         bind "Ctrl h" { SwitchToMode "Move"; }
         bind "Ctrl g" { SwitchToMode "Locked"; }
+        //panes
         bind "h" "Left" { MoveFocus "Left"; }
         bind "l" "Right" { MoveFocus "Right"; }
         bind "j" "Down" { MoveFocus "Down"; }
         bind "k" "Up" { MoveFocus "Up"; }
+        bind "w" { ToggleFloatingPanes; SwitchToMode "Normal"; }
+        bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+        bind "n" { NewPane; SwitchToMode "Normal"; }
+        bind "d" { NewPane "Down"; SwitchToMode "Normal"; }
+        bind "x" { CloseFocus; SwitchToMode "Normal"; }
+
+        // tabs
+        bind "H" { GoToPreviousTab; }
+        bind "L" { GoToNextTab; }
+        bind "N" { NewTab; SwitchToMode "Normal"; }
+        bind "X" { CloseTab; SwitchToMode "Normal"; }
+        bind "1" { GoToTab 1; SwitchToMode "Normal"; }
+        bind "2" { GoToTab 2; SwitchToMode "Normal"; }
+        bind "3" { GoToTab 3; SwitchToMode "Normal"; }
+        bind "4" { GoToTab 4; SwitchToMode "Normal"; }
+        bind "5" { GoToTab 5; SwitchToMode "Normal"; }
 //        bind "Ctrl s" { Write 2; SwitchToMode "Normal"; }
 //        bind "\"" { NewPane "Down"; SwitchToMode "Normal"; }
 //        bind "%" { NewPane "Right"; SwitchToMode "Normal"; }
@@ -147,7 +165,7 @@ keybinds clear-defaults=true {
 //        bind "d" { Detach; }
     }
     shared_except "locked" {
-        bind "Ctrl g" { SwitchToMode "Locked"; }
+//        bind "Ctrl g" { SwitchToMode "Locked"; }
 //        bind "Ctrl q" { Quit; }
 //        bind "Alt n" { NewPane; }
 //        bind "Alt h" "Alt Left" { MoveFocusOrTab "Left"; }
@@ -248,25 +266,26 @@ themes {
         cyan "#6a9589"
         white "#c8c093"
     }
-    catppuccin-mocha {
-        bg "#585b70" // Surface2
-        fg "#cdd6f4"
-        red "#f38ba8"
-        green "#a6e3a1"
-        blue "#89b4fa"
-        yellow "#f9e2af"
-        magenta "#f5c2e7" // Pink
-        orange "#fab387" // Peach
-        cyan "#89dceb" // Sky
-        black "#181825" // Mantle
-        white "#cdd6f4"
-    }
+//    catppuccin-mocha {
+//        bg "#585b70" // Surface2
+//        fg "#cdd6f4"
+//        red "#f38ba8"
+//        green "#a6e3a1"
+//        blue "#89b4fa"
+//        yellow "#f9e2af"
+//        magenta "#f5c2e7" // Pink
+//        orange "#fab387" // Peach
+//        cyan "#89dceb" // Sky
+//        black "#181825" // Mantle
+//        white "#cdd6f4"
+//    }
 }
 
 // Choose the theme that is specified in the themes section.
 // Default: default
 //
-theme "catppuccin-mocha"
+//theme "catppuccin-mocha"
+theme "kanagawa"
 
 // The name of the default layout to load on startup
 // Default: "default"
@@ -285,7 +304,7 @@ default_layout "main-compact"
 //   - true (default)
 //   - false
 //
-// mouse_mode false
+mouse_mode true
 
 // Configure the scroll back buffer size
 // This is the number of lines zellij stores for each pane in the scroll back
