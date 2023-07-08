@@ -13,10 +13,11 @@ vim.api.nvim_create_autocmd("FileType", {
     group = augroup("md_fo"),
     pattern = "markdown",
     callback = function()
-        vim.notify("Seting format options for markdown")
         vim.opt.textwidth = 100
         vim.opt.formatoptions = "jtcroql"
-        vim.opt.wrap = false
+        vim.opt.wrap = true
+        vim.opt.linebreak = true
+        vim.opt.breakindent = true
     end
 })
 
@@ -24,7 +25,14 @@ vim.api.nvim_create_autocmd("FileType", {
     group = augroup("md-no-neck-pain"),
     pattern = "markdown",
     callback = function()
-        vim.cmd("NoNeckPain")
+        -- vim.cmd("NoNeckPain")
+        -- vim.schedule(function ()
+        --     _G.NoNeckPain.enable()
+        -- end)
+        _G.NoNeckPain.enable()
+        -- vim.schedule(function ()
+        --     vim.cmd("wincmd l")
+        -- end)
     end
 })
 
