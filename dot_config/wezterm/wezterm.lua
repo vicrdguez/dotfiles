@@ -7,21 +7,26 @@ local config = {}
 -- In newer versions of wezterm, use the config_builder which will
 -- help provide clearer error messages
 if wezterm.config_builder then
-  config = wezterm.config_builder()
+    config = wezterm.config_builder()
 end
 
 local function scheme_for_appearance(appearance)
-  if appearance:find "Dark" then
-    return "Catppuccin Mocha"
-  else
-    return "Catppuccin Latte"
-  end
+
+    if appearance:find "Dark" then
+        return "Catppuccin Mocha"
+    else
+        return "Catppuccin Latte"
+    end
 end
 
 -- This is where you actually apply your config choices
 
 -- [[appearance
-config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
+-- config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
+local kanagawa = require("kanagawa")
+config.force_reverse_video_cursor = kanagawa.force_reverse_video_cursor
+config.colors = kanagawa.colors
+-- config.color_scheme = 'Kanagawa (Gogh)'
 config.enable_tab_bar = false
 config.window_decorations = "RESIZE"
 config.window_padding = {
@@ -43,12 +48,12 @@ config.font_size = 16
 
 -- https://wezfurlong.org/wezterm/config/lua/keyassignment/OpenLinkAtMouseCursor.html
 config.mouse_bindings = {
-  -- Ctrl-click will open the link under the mouse cursor
-  {
-    event = { Up = { streak = 1, button = 'Left' } },
-    mods = 'CTRL',
-    action = wezterm.action.OpenLinkAtMouseCursor,
-  },
+    -- Ctrl-click will open the link under the mouse cursor
+    {
+        event = { Up = { streak = 1, button = 'Left' } },
+        mods = 'CTRL',
+        action = wezterm.action.OpenLinkAtMouseCursor,
+    },
 }
 
 -- Using fish shell
@@ -57,4 +62,3 @@ config.default_prog = { '/usr/local/bin/fish', '-l' }
 
 -- and finally, return the configuration to wezterm
 return config
-
