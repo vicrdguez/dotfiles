@@ -8,7 +8,9 @@ return {
             -- completion sources
             { "hrsh7th/cmp-nvim-lsp" }, -- Required for nvim-lspconfig
             { "saadparwaiz1/cmp_luasnip" },
-            { "hrsh7th/cmp-nvim-lua" }
+            { "hrsh7th/cmp-nvim-lua" },
+            { "hrsh7th/cmp-buffer" },
+            { "hrsh7th/cmp-path" },
         },
         config = function()
             -- This function allows light-weight configuration of `nim-cmp` with `lsp-zero`. It is
@@ -48,13 +50,13 @@ return {
             end
 
             local function cycle_choice(_)
-                return cmp.mapping(function (fallback)
+                return cmp.mapping(function(fallback)
                     if ls.choice_active() then
                         ls.change_choice(1)
                     else
                         fallback()
                     end
-                end, {"i"})
+                end, { "i" })
             end
             cmp.setup({
                 snippet = {
@@ -66,14 +68,14 @@ return {
                 sources = {
                     { name = "nvim_lua" },
                     { name = "nvim_lsp" },
-                    { name = "path" },
-                    { name = "luasnip", keyword_length = 2 },
                     { name = "buffer",  keyword_length = 3 },
+                    { name = "luasnip", keyword_length = 2 },
+                    { name = "path" },
 
                 },
                 -- Having a lot of entries clutters the screen, I prefer limiting the number of entries
                 performance = {
-                    max_view_entries = 15,
+                    max_view_entries = 20,
                 },
                 -- Keymaps for completion related stuff
                 mapping = {
@@ -114,7 +116,7 @@ return {
                     })
                 },
                 experimental = {
-                    ghost_text = true
+                    ghost_text = false
                 },
             })
         end
