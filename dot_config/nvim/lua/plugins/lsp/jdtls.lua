@@ -13,9 +13,9 @@ local root_markers = { ".gradle", "gradlew", ".git", "pom.xml" }
 local mason_registry = require("mason-registry")
 
 local home = os.getenv("HOME")
--- using asdf to multi-verion java
-local java_install_path = home .. "/.asdf/installs/java/"
-
+-- using rtx to multi-verion java
+local java_install_path = home .. ".local/share/rtx/installs/java/"
+--/Users/vrodriguez/.local/share/rtx/installs/java/temurin-17.0.6+10/bin/java
 
 local function get_jdtls_paths(jdtls)
     if cache_vars.paths then
@@ -50,7 +50,7 @@ local function get_jdtls_paths(jdtls)
         "\n"
     )
     local vscode_java_test = mason_registry.get_package("java-test"):get_install_path()
-    local vscode_java_bundle = vim.split(vim.fn.glob(vscode_java_test.."/extension/server/*.jar", true), "\n")
+    local vscode_java_bundle = vim.split(vim.fn.glob(vscode_java_test .. "/extension/server/*.jar", true), "\n")
 
     -- add jars to the bundle list if there are any
     if java_debug_bundle[1] ~= "" then
@@ -112,7 +112,7 @@ local function enable_codelens(bufnr)
         buffer = bufnr,
         group = augroup("jdtls"),
         desc = "Refresh codelens",
-        callback = function ()
+        callback = function()
             pcall(vim.lsp.codelens.refresh)
         end
     })
@@ -146,16 +146,8 @@ M.jdtls_setup = function(event)
 
     local capabilities, extended_capabilities = get_jdtls_capabilities(jdtls)
 
-    -- /Users/vrodriguez/.asdf/installs/java/temurin-17.0.6+10
-    -- local cmd = {
-    --     -- "JAVA_HOME='/Users/vrodriguez/.asdf/installs/java/temurin-17.0.6+10' ".. paths.jdtls_bin,
-    --     paths.jdtls_bin,
-    --     "-configuration",
-    --     home .. "/.cache/jdtls",
-    --     "-data", paths.workspace_dir
-    -- }
     local cmd = {
-        home.."/.asdf/installs/java/temurin-17.0.6+10/bin/java",
+        java_install_path .. "temurin-17.0.6+10/bin/java",
         "-Declipse.application=org.eclipse.jdt.ls.core.id1",
         "-Dosgi.bundles.defaultStartLevel=4",
         "-Declipse.product=org.eclipse.jdt.ls.core.product",
@@ -183,7 +175,7 @@ M.jdtls_setup = function(event)
                 ls = {
                     -- vmargs = "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx1G -Xms100m"
                     java = {
-                        home = home.."/.asdf/installs/java/temurin-17.0.6+10",
+                        home = java_install_path .. "temurin-17.0.6+10",
                     }
                 }
             },
@@ -232,7 +224,7 @@ M.jdtls_setup = function(event)
                     profile = "GoogleStyle",
                 },
             },
-            contentProvider ={
+            contentProvider = {
                 preferred = "fernflower"
             },
             extendedClientCapabilities = extended_capabilities,

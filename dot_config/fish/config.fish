@@ -11,21 +11,16 @@ function set_alias
     alias cm="chezmoi"
 
 end
-
 fish_add_path /usr/local/bin
 fish_add_path /Users/vrodriguez/.cargo/bin/
 fish_add_path /Users/vrodriguez/.local/bin
-fish_add_path /Users/vrodriguez/.jenv/shims:/bin
-fish_add_path /Users/vrodriguez/.goenv/bin
 fish_add_path /Users/vrodriguez/bin
-fish_add_path /Users/vrodriguez/.jenv/bin
+fish_add_path /Users/vrodriguez/.deno/bin
 fish_add_path /usr/bin
 fish_add_path bin
 fish_add_path usr/sbin
 fish_add_path sbin
-
-source ~/.asdf/asdf.fish
-source ~/.asdf/plugins/java/set-java-home.fish
+fish_add_path $(go env GOPATH)/bin
 
 if status is-interactive
     # Commands to run in interactive sessions can go here
@@ -53,5 +48,5 @@ if not set -q ZELLIJ
     end
 end
 
-asdf_update_java_home
+~/.local/bin/rtx activate fish | source
 starship init fish | source
