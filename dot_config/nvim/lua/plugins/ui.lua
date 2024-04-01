@@ -13,66 +13,83 @@
 return {
     {
         'lukas-reineke/indent-blankline.nvim',
+        main = "ibl",
         opts = {
-            char = '┊',
-            show_trailing_blankline_indent = false,
+            indent = {
+                char = "┊"
+            }
+            -- whitespace = {
+            --     char = '┊',
+            -- },
+            -- show_trailing_blankline_indent = false,
         }
     },
-    -- {
-    --     'nvim-lualine/lualine.nvim',
-    --     event = 'VeryLazy',
-    --     dependencies = {
-    --         'nvim-tree/nvim-web-devicons',
-    --     },
-    --     opts = function(plugin)
-    --         local icons = require("config").icons
-    --         return {
-    --             options = {
-    --                 icons_enabled = true,
-    --                 theme = 'auto',
-    --                 component_separators = '|',
-    --                 section_separators = '',
-    --                 -- component_separators = { left = '', right = '' },
-    --                 -- section_separators = { left = '', right = '' },
-    --                 globalstatus = false,
-    --             }, sections = {
-    --                 lualine_b = {
-    --                     'branch',
-    --                     {
-    --                         'diff',
-    --                         symbols = {
-    --                             added = icons.git.added,
-    --                             modified = icons.git.modified,
-    --                             removed = icons.git.removed
-    --                         }
-    --                     }
-    --                 },
-    --                 lualine_c = {
-    --                     {
-    --                         'diagnostics',
-    --                         -- sources = {'nvim_lsp', 'nvim_diagnostic'},
-    --                         -- sections = { 'error', 'warn', 'info', 'hint'},
-    --                         -- symbols = {error = 'E', warn = 'W', info = 'I', hint = 'H'},
-    --                         symbols = {
-    --                             error = icons.diagnostics.Error,
-    --                             warn = icons.diagnostics.Warn,
-    --                             info = icons.diagnostics.Info,
-    --                             hint = icons.diagnostics.Hint
-    --                         },
-    --                         colored = true,
-    --                     },
-    --                     { 'filename', symbols = { modified = " ", readonly = ' [ro] ' } }
-    --                 }
-    --
-    --             }
-    --         }
-    --     end
-    -- },
+    {
+        'nvim-lualine/lualine.nvim',
+        enabled = true,
+        event = 'VeryLazy',
+        dependencies = {
+            'nvim-tree/nvim-web-devicons',
+        },
+        opts = function(plugin)
+            local icons = require("config").icons
+            local theme = require("custom.lualine")
+            return {
+                options = {
+                    icons_enabled = true,
+                    theme = theme.kanagawa_dragon(),
+                    -- component_separators = '|',
+                    -- section_separators = '',
+                    -- component_separators = { left = '', right = '' },
+                    -- section_separators = { left = '', right = '' },
+                    -- globalstatus = false,
+                },
+                -- sections = {
+                --     lualine_b = {
+                --         'branch',
+                --         {
+                --             'diff',
+                --             symbols = {
+                --                 added = icons.git.added,
+                --                 modified = icons.git.modified,
+                --                 removed = icons.git.removed
+                --             }
+                --         }
+                --     },
+                --     lualine_c = {
+                --         {
+                --             'diagnostics',
+                --             -- sources = {'nvim_lsp', 'nvim_diagnostic'},
+                --             -- sections = { 'error', 'warn', 'info', 'hint'},
+                --             -- symbols = {error = 'E', warn = 'W', info = 'I', hint = 'H'},
+                --             symbols = {
+                --                 error = icons.diagnostics.Error .. " ",
+                --                 warn = icons.diagnostics.Warn .. " ",
+                --                 info = icons.diagnostics.Info .. " ",
+                --                 hint = icons.diagnostics.Hint .. " "
+                --             },
+                --             colored = true,
+                --         },
+                --         {
+                --             'filename',
+                --             symbols = { modified = icons.git.modified, readonly = ' [ro] ' },
+                --             path = 3,
+                --
+                --         },
+                --     }
+                --
+                -- }
+            }
+        end
+    },
     {
         "freddiehaddad/feline.nvim",
         lazy = false,
+        enabled = false,
         -- dependencies = { "catppuccin/nvim" },
-        init = require("custom.feline").kanagawa()
+        init = function()
+            require("custom.feline").catppuccin()
+        end
     },
     {
         "goolord/alpha-nvim",
@@ -112,22 +129,22 @@ return {
             })
         end
     },
-    {
-        "SmiteshP/nvim-navic", -- attached on nvim-lspconfig. See lsp/init.lua
-        opts = {
-            lsp = {
-                auto_attach = true,
-            },
-            highligh = true,
-        }
-        -- lazy = true,
-        -- opts = function()
-        --     return {
-        --         separator = " ",
-        --         highlight = true,
-        --         depth_limit = 5,
-        --         icons = require("config").icons.kinds
-        --     }
-        -- end
-    },
+    -- {
+    --     "SmiteshP/nvim-navic", -- attached on nvim-lspconfig. See lsp/init.lua
+    --     opts = {
+    --         lsp = {
+    --             auto_attach = true,
+    --         },
+    --         highligh = true,
+    --     }
+    --     -- lazy = true,
+    --     -- opts = function()
+    --     --     return {
+    --     --         separator = " ",
+    --     --         highlight = true,
+    --     --         depth_limit = 5,
+    --     --         icons = require("config").icons.kinds
+    --     --     }
+    --     -- end
+    -- },
 }

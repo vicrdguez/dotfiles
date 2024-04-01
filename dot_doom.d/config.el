@@ -12,7 +12,7 @@
 
 (add-hook 'after-save-hook #'vic/chezmoi-re-add-on-save)
 
-(setq vic/org-dir "~/dev/braindump-org/")
+(setq vic/org-dir "~/dev/kb/braindump.org/")
 
 (require 'package)
 
@@ -27,25 +27,32 @@
       :desc "M-x" ";" #'execute-extended-command
       :desc "Eval expression" ":" #'pp-eval-expression)
 
+(map! :leader
+      :prefix "f"
+      :desc "Find file" "." #'find-file)
+
 (setq display-line-numbers-type 'relative)
 
-(setq doom-font (font-spec :family "Iosevka" :size 14)
-      doom-variable-pitch-font (font-spec :family "Iosevka Etoile" :size 14)
-      doom-unicode-font (font-spec :family "Symbols Nerd Font Mono" :size 14))
+(setq doom-font (font-spec :family "Iosevka" :size 16)
+      doom-variable-pitch-font (font-spec :family "Iosevka Etoile" :size 16)
+      doom-unicode-font (font-spec :family "Symbols Nerd Font Mono" :size 16))
 
 (after! doom-modeline
   (doom-modeline-def-modeline 'main
     '(bar matches buffer-info remote-host buffer-position parrot selection-info)
     '(misc-info minor-modes lsp checker input-method buffer-encoding major-mode process vcs "  "))) ; <-- added padding here
 
-(setq doom-theme 'doom-gruvbox)
-(setq! doom-gruvbox-dark-variant "hard")
-;; (setq catppuccin-flavor 'mocha) ;; or 'latte, 'macchiato, or 'mocha
-;; (load-theme 'catppuccin t t)
-;; (catppuccin-reload)
+(setq doom-theme 'kanagawa)
 
- (set-frame-parameter (selected-frame)'alpha '(95 . 95))
- (add-to-list 'default-frame-alist'(alpha . (95 . 95)))
+;; (setq doom-horizon-comment-bg t)
+;; (setq! doom-gruvbox-dark-variant "hard")
+;; (setq catppuccin-flavor 'mocha) ;; or 'latte, 'macchiato, or 'mocha
+;; (after! catppuccin
+;;   (catppuccin-reload))
+
+ (set-frame-parameter (selected-frame)'alpha '(97 . 97))
+ (add-to-list 'default-frame-alist'(alpha . (97 . 97)))
+ ;; (add-to-list 'default-frame-alist'(alpha . (100 . 100)))
 
 ;; (after! org
 ;;   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
@@ -107,41 +114,92 @@
 ;;   (setq deft-extensions '("org"))
 ;;   (setq deft-recursive t))
 
-(use-package! company
+;; (use-package! company
+;;   :config
+;;   (setq company-tooltip-limit 10
+;;         company-tooltip-minimum-width 30
+;;         company-minimum-prefix-length 2
+;;         company-box-doc-enable t
+;;         company-box-scrollbar nil
+;;         company-idle-delay 0.3)
+;;   ;; (after! org-mode
+;;   ;;   (set-company-backend! 'org-mode'))
+;;   )
+
+(use-package! cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev))
+
+(use-package! corfu
   :config
-  (setq company-tooltip-limit 10
-        company-tooltip-minimum-width 30
-        company-minimum-prefix-length 2
-        company-box-doc-enable t
-        company-box-scrollbar nil
-        company-idle-delay 0.2))
+  (after! evil-collection-corfu
+    (evil-collection-define-key 'insert 'corfu-map
+      (kbd "C-f") #'corfu-insert))
+  (map! (:map corfu-popupinfo-map
+              "C-n" #'corfu-popupinfo-scroll-down
+              "C-p" #'corfu-popupinfo-scroll-up)))
 
-(map! :after vertico
- :when (modulep! :editor evil +everywhere)
+(use-package! vertico
+  :init
+  (map! :when (modulep! :editor evil +everywhere)
         :map vertico-map
-        "C-<return>" #'vertico-exit-input)
+        "C-<return>" #'vertico-exit-input))
 
-(setq org-directory vic/org-dir)
+(use-package! consult
+  :defer t
+  :init
+  (map! :leader
+        :desc "Search on current file" "/" #'consult-line
+        :desc "Find file recursive" "." #'consult-find
+        :desc "Switch buffers" "SPC" #'consult-buffer
+        (:prefix "s"
+         :desc "Ripgrep on current dir" "g" #'consult-ripgrep
+         :desc "Search yank history" "y" #'consult-yank-from-kill-ring
+         ))
+  :config
+  (add-to-list 'consult-preview-allowed-hooks 'global-org-modern-mode-check-buffers)
+  (add-to-list 'consult-preview-allowed-hooks 'global-visual-line-mode-check-buffers)
+  (add-to-list 'consult-preview-allowed-hooks 'global-visual-fill-column-mode-check-buffers))
 
-(after! org (setq org-pretty-entities t
-                  org-hide-emphasis-markers t)
-  (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
-  (setq split-height-threshold nil)
-  (setq split-width-threshold 0)
-  (setq org-indent-indentation-per-level 4)
-  (setq org-export-with-toc nil)
-  (setq org-link-make-description-function 'vic/get-url-title)
+;; (after! org
+;;   (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
+;;   (setq! help-at-pt-display-when-idle t)
+;;   (setq org-export-with-toc nil)
+;;   (setq org-link-make-description-function 'vic/get-url-title)
   ;; hooks
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
-  (add-hook 'org-mode-hook 'org-appear-mode)
-  (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+  ;; (add-hook 'org-mode-hook 'org-appear-mode)
+  ;; (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
   ;; bindings
+
+(use-package! org
+  :init
+  (setq org-directory vic/org-dir)
+  :config
   (map! :map org-mode-map
         "C-k" #'org-previous-visible-heading
-        "C-j" #'org-next-visible-heading))
+        "C-j" #'org-next-visible-heading
+        ;; :n "RET" #'+org/dwim-at-point
+        )
+  (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
+  (add-hook 'org-mode-hook 'org-appear-mode)
+  (setq org-pretty-entities t
+        org-hide-emphasis-markers t
+        org-indent-indentation-per-level 4
+        org-export-with-toc nil
+        org-link-make-description-function 'vic/get-url-title
+        split-width-threshold 0
+        split-height-threshold nil)
+  (setq! help-at-pt-display-when-idle t)
+  (global-visual-line-mode)
+  (global-visual-fill-column-mode)
+  :hook '(
+          ;; (visual-line-mode . visual-fill-column-mode)
+          (org-mode . turn-on-auto-fill)
+          (org-mode . org-appear-mode)))
 
 (add-hook 'org-mode-hook (lambda ()
-                           (setq visual-fill-column-center-text nil)
+                           (setq visual-fill-column-center-text t)
                            (setq visual-fill-column-enable-sensible-window-split t)
                            (setq visual-fill-column-width 120)))
 
@@ -172,16 +230,15 @@
 
 (add-hook 'org-mode-hook 'org-add-electric-pairs)
 
-(add-hook 'org-mode-hook 'org-fragtog-mode)
+;; (add-hook 'org-mode-hook 'org-fragtog-mode)
 
 (use-package! org-appear
   :after org
-  :init (setq org-appear-autolinks nil))
+  :config (setq org-appear-autolinks nil))
 
 (use-package! org-roam
   :after org
   :init
-
   (map! :leader
         :prefix ("r" . "roam")
         ;; :desc "insert" "i" #'org-roam-insert
@@ -192,21 +249,17 @@
         :desc "Org Roam" "r" #'org-roam-buffer-toggle
         ;; :desc "Find node" "f" #'dendroam-node-find-initial-input
         :desc "Find node" "f" #'org-roam-node-find
+        ;; :desc "Find node" "f" #'consult-org-roam-file-find
         :desc "Insert node link" "i" #'org-roam-node-insert
         :desc "Insert (skipping capture)" "I" #'org-roam-insert-immediate
         :desc "Capture in today's daily" "t" #'org-roam-dailies-capture-today
         :desc "Take screenshot and insert at point" "," #'org-download-screenshot
         :desc "Insert clipboard image at point" "." #'org-download-clipboard
         (:prefix ("d" . "Open By date")
-         :desc "Arbitrary date" "d" #'org-roam-dailies-find-date
-         :desc "Tomorrow" "m" #'org-roam-dailies-find-tomorrow
-         :desc "Today" "t" #'org-roam-dailies-find-today
-         :desc "Yesterday" "y" #'org-roam-dailies-find-yesterday )
-        ;; (:prefix ("j" . "Org Roam dailies capture")
-        ;; :desc "Arbitrary date" "d" #'org-roam-dailies-capture-date
-        ;; :desc "Tomorrow" "m" #'org-roam-dailies-capture-tomorrow
-        ;; :desc "Today" "t" #'org-roam-dailies-capture-today
-        ;; :desc "Yesterday" "y" #'org-roam-dailies-capture-yesterday )
+         :desc "Arbitrary date" "d" #'org-roam-dailies-goto-date
+         :desc "Tomorrow" "m" #'org-roam-dailies-goto-tomorrow
+         :desc "Today" "t" #'org-roam-dailies-goto-today
+         :desc "Yesterday" "y" #'org-roam-dailies-goto-yesterday )
         )
   (global-set-key (kbd "C-c i") #'org-roam-node-insert)
   ;; (define-key map (kbd "C-c i") 'org-roam-node-insert)
@@ -214,7 +267,9 @@
         org-roam-completion-everywhere nil
         org-roam-node-display-template (format "%s %s ${doom-hierarchy-alias:*} ${backlinkscount}"
                                                (propertize "${doom-type:10}" 'face 'font-lock-keyword-face)
-                                               (propertize "${doom-tags:20}" 'face 'org-tag))))
+                                               (propertize "${doom-tags:20}" 'face 'org-tag))
+        ;; org-roam-node-display-template "${doom-tags:20} ${title:*}"
+        ))
 
 (after! org-roam
   (set-popup-rules!
@@ -283,7 +338,7 @@
         org-roam-ui-open-on-start t))
 
 (use-package! consult-org-roam
-  :ensure t
+  :defer t
   :after org-roam
   :init
   (require 'consult-org-roam)
@@ -293,7 +348,7 @@
    consult-org-roam-search
    org-roam-node-find
    :preview-key '(:debounce 0.8 any))
-  
+
   ;; Manual preview
   (consult-customize
    org-roam-node-insert
@@ -303,7 +358,6 @@
   (consult-org-roam-grep-func #'consult-ripgrep))
 
 (use-package! org-download
-  :ensure t
   :init
   (with-eval-after-load 'org
     (org-download-enable))
@@ -311,6 +365,7 @@
   (setq-default org-download-image-dir (concat vic/org-dir "_meta/assets/"))
   (setq org-download-screenshot-method "screencapture -i %s"
         org-download-heading-lvl nil
+        org-download-edit-cmd "open %s"
         org-download-method 'directory)
   (setq org-image-actual-width 720)
   :hook (dired-mode . org-download-enable))

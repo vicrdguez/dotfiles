@@ -2,10 +2,10 @@ local M = {}
 
 
 --- Nice little tricks from our frind TJ
-P = function(val)
+P = function(val, comment)
     local info = debug.getinfo(2, "Sn")
     -- print(caller_func.."\n=====\n" .. vim.inspect(val) .. "\n=====")
-    print(string.format("%s: %s\n=====\n%s\n=====", info.short_src, info.name, vim.inspect(val)))
+    print(string.format("%s\n%s: %s\n=====\n%s\n=====", comment, info.short_src, info.name, vim.inspect(val)))
     return val
 end
 
@@ -125,10 +125,14 @@ function M.run(mod_name, func, opts)
     return nil
 end
 
---- Creates a folder if it does not exsist. It assumes happy path now and does not check on any 
+function M.slug(str)
+    return str:gsub("(%u)(%u)", "%1-%2"):lower():gsub(" ", "-")
+end
+
+--- Creates a folder if it does not exsist. It assumes happy path now and does not check on any
 --- errors like creating a folder in a read only fs.
 ---
----@param dir string the directory to create 
+---@param dir string the directory to create
 ---@return string|boolean mkdir_out created directory or false if it already existed
 function M.maybe_mkdir(dir)
     local output = vim.fn.system("ls " .. dir)
@@ -141,6 +145,107 @@ function M.maybe_mkdir(dir)
         end
     end
     return true
+end
+
+function M.real_path(path, from)
+    local expanded_path = vim.fn.expand(path)
+    local cmd = "realpath " .. expanded_path
+    if from then
+        cmd = "cd " .. from .. ";" .. cmd
+    end
+    local result = vim.fn.systemlist(cmd)
+    if result ~= nil then
+        return result[1]
+    end
+    return nil
+end
+
+function M.resolve_nix_store_path(path)
+
+end
+
+function M.relative_path(filenames, dir)
+    local cmd = "realpath --relative-to " .. dir
+
+    if type(filenames) == table then
+        for filename in pairs(filenames) do
+            cmd = cmd .. " " .. filename
+        end
+    else
+        cmd = cmd .. " " .. filenames
+    end
+
+    local result = vim.fn.systemlist(cmd)
+    if result ~= nil then
+        if #result > 1 then
+            return result
+        end
+        return result[1]
+    end
+    return nil
+end
+
+function M.relative_to_current(filenames)
+    return M.relative_path(filenames, vim.fn.expand("%:h"))
+end
+
+-- using rtx to multi-verion java
+--/Users/vrodriguez/.local/share/rtx/installs/java/temurin-17.0.6+10/bin/java
+
+function M.get_java_versions()
+    local home = os.getenv("HOME")
+    local java_install_path = home .. "/.local/share/mise/installs/java/"
+    local java_8_version
+    local java_11_version
+    local java_17_version
+    local java_21_version
+    local output = vim.fn.json_decode(vim.fn.systemlist({ "mise", "list", "java", "--json" }))
+    for _, java in pairs(output) do
+        if string.find(java.version, "-8.") then
+            java_8_version = java.version
+        elseif string.find(java.version, "-11.") then
+            java_11_version = java.version
+        elseif string.find(java.version, "-17.") then
+            java_17_version = java.version
+        elseif string.find(java.version, "-21.") then
+            java_21_version = java.version
+        end
+    end
+    -- print("java 8: " .. java_8_version)
+    -- print("java 11: " .. java_11_version)
+    -- print("java 17: " .. java_17_version)
+    -- print("java 21: " .. java_21_version)
+    return {
+        {
+            name = "JavaSE-1.8",
+            path = java_install_path .. java_8_version,
+        },
+        {
+            name = "JavaSE-11",
+            path = java_install_path .. java_11_version,
+        },
+        {
+            name = "JavaSE-17",
+            path = java_install_path .. java_17_version,
+            default = true,
+        },
+        {
+            name = "JavaSE-21",
+            path = java_install_path .. java_21_version,
+        },
+    }
+end
+
+function M.test_tables()
+    local test = {
+        hei = "word",
+        hooo = "word",
+    }
+
+    for k, v in ipairs(test) do
+        P(k)
+        P(v)
+    end
 end
 
 return M

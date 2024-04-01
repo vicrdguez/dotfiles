@@ -32,12 +32,14 @@ Adding a hook that auto-balances windows on any window change. This custom funct
 (add-hook 'window-configuration-change-hook #'vic/auto-balance-windows)
 #+end_src
 
+#+RESULTS:
+| vic/auto-balance-windows | winner-change-fun | +doom-dashboard-resize-h | doom-modeline-invalidate-huds | doom-modeline-refresh-bars | evil-refresh-cursor | window--adjust-process-windows |
+
 
 This hooks executes after saving any file, the function attached adds changes made to *just* to the doom config into [[https://www.chezmoi.io/][chezmoi]] tracking directory.
 
 #+begin_src elisp
 (add-hook 'after-save-hook #'vic/chezmoi-re-add-on-save)
-
 #+end_src
 
 With ~evil-respect-visual-line-mode~ vim ~j~ and ~k~ keys use visual lines, so we can move sanely through wrapped text. [[https://archive.baty.net/2020/respecting-visual-lines-in-doom-emacs/][Respecting visual lines in (Doom) emacs]]. Sadly it didn't worked so I had to set the variable in my [[file:init.el::setq evil-respect-visual-line-mode t][init.el]], I guess to avoid race conditions overriding it.
@@ -46,11 +48,11 @@ With ~evil-respect-visual-line-mode~ vim ~j~ and ~k~ keys use visual lines, so w
 I put some vars here that I need since the beginning of the config so there is no conflicts trying to set a variable with another that is not set yet
 
 #+begin_src elisp
-(setq vic/org-dir "~/dev/braindump-org/")
+(setq vic/org-dir "~/dev/kb/braindump.org/")
 #+end_src
 
 #+RESULTS:
-: ~/dev/braindump-org/
+: ~/dev/kb/braindump.org/
 
 ** Package sources
 Configuring package sources
@@ -74,17 +76,21 @@ Use fish as the shell with ~vterm~
 : fish
 
 ** General bindings
-I use =M-x= much more than =Eval=, so I want to swap their keybindings, since =<space>;= is easier to press
+I use =M-x= much more than =Eval=, so I want to swap their keybindings, since =<space>;= is easier to press. There are other convenient mappings that I'm used to.
 
 #+begin_src elisp
 (map! :map 'override
       :leader
       :desc "M-x" ";" #'execute-extended-command
       :desc "Eval expression" ":" #'pp-eval-expression)
+
+(map! :leader
+      :prefix "f"
+      :desc "Find file" "." #'find-file)
 #+end_src
 
 #+RESULTS:
-: pp-eval-expression
+: find-file
 
 * UI
 ** Line numbers
@@ -110,9 +116,9 @@ Doom exposes five (optional) variables for controlling fonts in Doom:
  See 'C-h v doom-font' for documentation and more examples of what they
  accept. For example:
 #+begin_src elisp
-(setq doom-font (font-spec :family "Iosevka" :size 14)
-      doom-variable-pitch-font (font-spec :family "Iosevka Etoile" :size 14)
-      doom-unicode-font (font-spec :family "Symbols Nerd Font Mono" :size 14))
+(setq doom-font (font-spec :family "Iosevka" :size 16)
+      doom-variable-pitch-font (font-spec :family "Iosevka Etoile" :size 16)
+      doom-unicode-font (font-spec :family "Symbols Nerd Font Mono" :size 16))
 #+end_src
 
 #+RESULTS:
@@ -133,24 +139,29 @@ Add padding to the modeline so the display is not cut off the screen
 
 ** Theme
 #+begin_src elisp
-(setq doom-theme 'doom-gruvbox)
-(setq! doom-gruvbox-dark-variant "hard")
+(setq doom-theme 'kanagawa)
+
+;; (setq doom-horizon-comment-bg t)
+;; (setq! doom-gruvbox-dark-variant "hard")
 ;; (setq catppuccin-flavor 'mocha) ;; or 'latte, 'macchiato, or 'mocha
-;; (load-theme 'catppuccin t t)
-;; (catppuccin-reload)
+;; (after! catppuccin
+;;   (catppuccin-reload))
 #+end_src
 
+
 #+RESULTS:
+: kanagawa
 
 Configuring transparency to 95%
 
 #+begin_src elisp
- (set-frame-parameter (selected-frame)'alpha '(95 . 95))
- (add-to-list 'default-frame-alist'(alpha . (95 . 95)))
+ (set-frame-parameter (selected-frame)'alpha '(97 . 97))
+ (add-to-list 'default-frame-alist'(alpha . (97 . 97)))
+ ;; (add-to-list 'default-frame-alist'(alpha . (100 . 100)))
 #+end_src
 
 #+RESULTS:
-: ((alpha 95 . 95) (buffer-predicate . doom-buffer-frame-predicate) (right-divider-width . 1) (bottom-divider-width . 1) (vertical-scroll-bars) (tool-bar-lines . 0) (menu-bar-lines . 0) (left-fringe . 8) (right-fringe . 8))
+: ((alpha 97 . 97) (alpha 98 . 98) (alpha 95 . 95) (buffer-predicate . doom-buffer-frame-predicate) (right-divider-width . 1) (bottom-divider-width . 1) (alpha 100 . 100) (vertical-scroll-bars) (tool-bar-lines . 0) (menu-bar-lines . 0) (left-fringe . 8) (right-fringe . 8))
 
 ** Org mode stylling
 ~org-modern-mode~ prettyfies org-mode a lot. I enable it globaly. The bullet star icons are modified by custom in [[file:custom.el::(custom-set-variables][custom.el]]
@@ -277,32 +288,79 @@ This package config is simple, I just need to specify my org-directory (since I'
 * Completions
 ** Company
 #+begin_src elisp
-(use-package! company
+;; (use-package! company
+;;   :config
+;;   (setq company-tooltip-limit 10
+;;         company-tooltip-minimum-width 30
+;;         company-minimum-prefix-length 2
+;;         company-box-doc-enable t
+;;         company-box-scrollbar nil
+;;         company-idle-delay 0.3)
+;;   ;; (after! org-mode
+;;   ;;   (set-company-backend! 'org-mode'))
+;;   )
+#+end_src
+
+#+RESULTS:
+** Corfu / Cape
+#+begin_src elisp
+(use-package! cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev))
+#+end_src
+
+#+begin_src elisp
+(use-package! corfu
   :config
-  (setq company-tooltip-limit 10
-        company-tooltip-minimum-width 30
-        company-minimum-prefix-length 2
-        company-box-doc-enable t
-        company-box-scrollbar nil
-        company-idle-delay 0.3))
+  (after! evil-collection-corfu
+    (evil-collection-define-key 'insert 'corfu-map
+      (kbd "C-f") #'corfu-insert))
+  (map! (:map corfu-popupinfo-map
+              "C-n" #'corfu-popupinfo-scroll-down
+              "C-p" #'corfu-popupinfo-scroll-up)))
 #+end_src
 
 #+RESULTS:
 : t
 
 ** Vertico
-At some point, you want to complete the =vertico= selection with the current input, but without selecting any of the candidates. This is a problem because the is alway a selected candidate. Thus if you input =hell= its is going to match and select say, =hello=, when you hit ~RET~. You can exit the completion with the input's content (~vertico-exit-input~) using the keybind ~M-RET~ however using ~M~ is not comfortable for me due to the custom layout of my keyboard.
+At some point, you want to complete the =vertico= selection with the current input, but without selecting any of the candidates. This is a problem because there is alway a selected candidate. Thus if you input =hell= its is going to match and select say, =hello=, when you hit ~RET~. You can exit the completion with the input's content (~vertico-exit-input~) using the keybind ~M-RET~ however using ~M~ is not comfortable for me due to the custom layout of my keyboard.
 
-For that reason I want to map ~vertico-exit-input~ to ~C-RET~ instead. The nasty surprise it that it won't work, apparently because ~C-RET~ won't behave as one may think. I need to bind it to ~C-<return>~  instead. This [[https://emacs.stackexchange.com/a/29776][answer on StackExchange]] gave me the solution.
+For that reason I want to map ~vertico-exit-input~ to ~C-RET~ instead. The nasty surprise is that it won't work, apparently because ~C-RET~ won't behave as one may think. I need to bind it to ~C-<return>~  instead. This [[https://emacs.stackexchange.com/a/29776][answer on StackExchange]] gave me the solution.
 
 #+begin_src elisp
-(map! :after vertico
- :when (modulep! :editor evil +everywhere)
+(use-package! vertico
+  :init
+  (map! :when (modulep! :editor evil +everywhere)
         :map vertico-map
-        "C-<return>" #'vertico-exit-input)
+        "C-<return>" #'vertico-exit-input))
 #+end_src
 
 #+RESULTS:
+** Consult
+
+#+begin_src elisp
+(use-package! consult
+  :defer t
+  :init
+  (map! :leader
+        :desc "Search on current file" "/" #'consult-line
+        :desc "Find file recursive" "." #'consult-find
+        :desc "Switch buffers" "SPC" #'consult-buffer
+        (:prefix "s"
+         :desc "Ripgrep on current dir" "g" #'consult-ripgrep
+         :desc "Search yank history" "y" #'consult-yank-from-kill-ring
+         ))
+  :config
+  (add-to-list 'consult-preview-allowed-hooks 'global-org-modern-mode-check-buffers)
+  (add-to-list 'consult-preview-allowed-hooks 'global-visual-line-mode-check-buffers)
+  (add-to-list 'consult-preview-allowed-hooks 'global-visual-fill-column-mode-check-buffers))
+
+#+end_src
+
+#+RESULTS:
+: t
+
 
 * Org mode
 This config aims to make using org mode more pleasant for writing. The interesting bits are:
@@ -311,27 +369,46 @@ This config aims to make using org mode more pleasant for writing. The interesti
 
 
 #+begin_src elisp
-(setq org-directory vic/org-dir)
-
-(after! org (setq org-pretty-entities t
-                  org-hide-emphasis-markers t)
-  (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
-  (setq split-height-threshold nil)
-  (setq split-width-threshold 0)
-  (setq org-indent-indentation-per-level 4)
-  (setq org-export-with-toc nil)
-  (setq org-link-make-description-function 'vic/get-url-title)
+;; (after! org
+;;   (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
+;;   (setq! help-at-pt-display-when-idle t)
+;;   (setq org-export-with-toc nil)
+;;   (setq org-link-make-description-function 'vic/get-url-title)
   ;; hooks
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
-  (add-hook 'org-mode-hook 'org-appear-mode)
-  (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+  ;; (add-hook 'org-mode-hook 'org-appear-mode)
+  ;; (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
   ;; bindings
+
+(use-package! org
+  :init
+  (setq org-directory vic/org-dir)
+  :config
   (map! :map org-mode-map
         "C-k" #'org-previous-visible-heading
-        "C-j" #'org-next-visible-heading))
+        "C-j" #'org-next-visible-heading
+        ;; :n "RET" #'+org/dwim-at-point
+        )
+  (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window)
+  (add-hook 'org-mode-hook 'org-appear-mode)
+  (setq org-pretty-entities t
+        org-hide-emphasis-markers t
+        org-indent-indentation-per-level 4
+        org-export-with-toc nil
+        org-link-make-description-function 'vic/get-url-title
+        split-width-threshold 0
+        split-height-threshold nil)
+  (setq! help-at-pt-display-when-idle t)
+  (global-visual-line-mode)
+  (global-visual-fill-column-mode)
+  :hook '(
+          ;; (visual-line-mode . visual-fill-column-mode)
+          (org-mode . turn-on-auto-fill)
+          (org-mode . org-appear-mode)))
 #+end_src
 
 #+RESULTS:
+| turn-on-auto-fill | er/add-org-mode-expansions | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-appear-mode | +lookup--init-org-mode-handlers-h | (closure (t) (&rest _) (add-hook 'before-save-hook 'org-encrypt-entries nil t)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | org-add-electric-pairs | (lambda nil (add-to-list 'display-buffer-alist '((\`\*Org-roam\*\*\[[^]]+\]\*\' (display-buffer-in-side-window) (side . right) (slot . -1) (window-width . 0.33) (preserve-size t))))) | (lambda nil (setq visual-fill-column-center-text t) (setq visual-fill-column-enable-sensible-window-split t) (setq visual-fill-column-width 120)) | doom-disable-show-paren-mode-h | doom-disable-show-trailing-whitespace-h | +org-make-last-point-visible-h | evil-org-mode | toc-org-enable | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | embrace-org-mode-hook | (closure (t) (&rest _) (add-to-list 'completion-at-point-functions #'cape-elisp-block)) | corfu-mode | org-eldoc-load |
 
 ** Hooks
 I want to use centered text mode for my org mode files but not for the =helpful= documentation. So I create my own hook that I attach to org mode but not to helpful. This Hook is farily simple, it just enables ~visual-fill-column-center-text~.
@@ -386,22 +463,22 @@ I want also to auto pair tildes (~~~) for inline code. This should make the tric
 Enabling Latex inline preview:
 
 #+begin_src elisp
-(add-hook 'org-mode-hook 'org-fragtog-mode)
+;; (add-hook 'org-mode-hook 'org-fragtog-mode)
 #+end_src
 
 #+RESULTS:
 
 ** Org appear
-Org is not able to look show and hide emphasis markers dynamically (e.g. showing the markers just when the cursor is on a marked region like Obsidian). Using ~org-appear~ helps with this so it works as expected.
+Org is not able to show and hide emphasis markers dynamically (e.g. showing the markers just when the cursor is on a marked region like Obsidian). Using ~org-appear~ helps with this so it works as expected.
 
 #+begin_src elisp
 (use-package! org-appear
   :after org
-  :init (setq org-appear-autolinks nil))
+  :config (setq org-appear-autolinks nil))
 #+end_src
 
 #+RESULTS:
-: org-appear
+: t
 
 
 #+RESULTS:
@@ -413,7 +490,6 @@ Package config and bindings
 (use-package! org-roam
   :after org
   :init
-
   (map! :leader
         :prefix ("r" . "roam")
         ;; :desc "insert" "i" #'org-roam-insert
@@ -424,21 +500,17 @@ Package config and bindings
         :desc "Org Roam" "r" #'org-roam-buffer-toggle
         ;; :desc "Find node" "f" #'dendroam-node-find-initial-input
         :desc "Find node" "f" #'org-roam-node-find
+        ;; :desc "Find node" "f" #'consult-org-roam-file-find
         :desc "Insert node link" "i" #'org-roam-node-insert
         :desc "Insert (skipping capture)" "I" #'org-roam-insert-immediate
         :desc "Capture in today's daily" "t" #'org-roam-dailies-capture-today
         :desc "Take screenshot and insert at point" "," #'org-download-screenshot
         :desc "Insert clipboard image at point" "." #'org-download-clipboard
         (:prefix ("d" . "Open By date")
-         :desc "Arbitrary date" "d" #'org-roam-dailies-find-date
-         :desc "Tomorrow" "m" #'org-roam-dailies-find-tomorrow
-         :desc "Today" "t" #'org-roam-dailies-find-today
-         :desc "Yesterday" "y" #'org-roam-dailies-find-yesterday )
-        ;; (:prefix ("j" . "Org Roam dailies capture")
-        ;; :desc "Arbitrary date" "d" #'org-roam-dailies-capture-date
-        ;; :desc "Tomorrow" "m" #'org-roam-dailies-capture-tomorrow
-        ;; :desc "Today" "t" #'org-roam-dailies-capture-today
-        ;; :desc "Yesterday" "y" #'org-roam-dailies-capture-yesterday )
+         :desc "Arbitrary date" "d" #'org-roam-dailies-goto-date
+         :desc "Tomorrow" "m" #'org-roam-dailies-goto-tomorrow
+         :desc "Today" "t" #'org-roam-dailies-goto-today
+         :desc "Yesterday" "y" #'org-roam-dailies-goto-yesterday )
         )
   (global-set-key (kbd "C-c i") #'org-roam-node-insert)
   ;; (define-key map (kbd "C-c i") 'org-roam-node-insert)
@@ -446,11 +518,14 @@ Package config and bindings
         org-roam-completion-everywhere nil
         org-roam-node-display-template (format "%s %s ${doom-hierarchy-alias:*} ${backlinkscount}"
                                                (propertize "${doom-type:10}" 'face 'font-lock-keyword-face)
-                                               (propertize "${doom-tags:20}" 'face 'org-tag))))
+                                               (propertize "${doom-tags:20}" 'face 'org-tag))
+        ;; org-roam-node-display-template "${doom-tags:20} ${title:*}"
+        ))
 #+end_src
 
 #+RESULTS:
 : org-roam
+
 
 I prefer to keep the =org-roam= buffer as a /sidebar/, it is a regular window though, so this configuration makes it not replace other windows and be smaller
 
@@ -543,7 +618,7 @@ This will set up the beatiful =org-roam=ui= package
 
 #+begin_src elisp
 (use-package! consult-org-roam
-  :ensure t
+  :defer t
   :after org-roam
   :init
   (require 'consult-org-roam)
@@ -553,7 +628,7 @@ This will set up the beatiful =org-roam=ui= package
    consult-org-roam-search
    org-roam-node-find
    :preview-key '(:debounce 0.8 any))
-  
+
   ;; Manual preview
   (consult-customize
    org-roam-node-insert
@@ -564,7 +639,6 @@ This will set up the beatiful =org-roam=ui= package
 #+end_src
 
 #+RESULTS:
-: consult-org-roam
 
 ** Org download
 
@@ -574,7 +648,6 @@ Org download will allow you to paste images and take screenshots into org files.
 
 #+begin_src elisp
 (use-package! org-download
-  :ensure t
   :init
   (with-eval-after-load 'org
     (org-download-enable))
@@ -582,13 +655,14 @@ Org download will allow you to paste images and take screenshots into org files.
   (setq-default org-download-image-dir (concat vic/org-dir "_meta/assets/"))
   (setq org-download-screenshot-method "screencapture -i %s"
         org-download-heading-lvl nil
+        org-download-edit-cmd "open %s"
         org-download-method 'directory)
   (setq org-image-actual-width 720)
   :hook (dired-mode . org-download-enable))
 #+end_src
 
 #+RESULTS:
-| org-download-enable | +dired-disable-gnu-ls-flags-maybe-h | doom--recentf-add-dired-directory-h | (lambda nil display-fill-column-indicator-mode nil) | all-the-icons-dired-mode | dired-omit-mode | diredfl-mode |
+| +dired-disable-gnu-ls-flags-maybe-h | doom--recentf-add-dired-directory-h | org-download-enable | (lambda nil display-fill-column-indicator-mode nil) | all-the-icons-dired-mode | dired-omit-mode | diredfl-mode |
 
 ** Org Babel
 Appart from evaluating =emacs-lisp= code blocks in org mode I also want to evaluate =bash= code block evaluation so we need to add ~shell~ to the =org-babel= loaded languages.

@@ -2,6 +2,8 @@ return {
     {
         "catppuccin/nvim",
         name = "catppuccin",
+        lazy = false,
+        depencencies = { "freddiehaddad/feline.nvim" },
         priority = 1000,
         opts = {
             flavour = "mocha",
@@ -51,16 +53,37 @@ return {
 
     {
         'rebelot/kanagawa.nvim',
-        lazy = false,
+        lazy = true,
         opts = {
             transparent = false,
-            keywordStyle = { italic = false },
+            keywordStyle = { italic = true },
+            colors = { theme = { all = { ui = { bg_gutter = "none" } } } },
             overrides = function(colors)
                 local col = colors.palette
                 return {
+                    -- update kanagawa to handle new treesitter highlight captures
+                    ["@string.regexp"]           = { link = "@string.regex" },
+                    ["@variable.parameter"]      = { link = "@parameter" },
+                    ["@exception"]               = { link = "@exception" },
+                    ["@string.special.symbol"]   = { link = "@symbol" },
+                    ["@markup.strong"]           = { link = "@text.strong" },
+                    ["@markup.italic"]           = { link = "@text.emphasis" },
+                    ["@markup.heading"]          = { link = "@text.title" },
+                    ["@markup.raw"]              = { link = "@text.literal" },
+                    ["@markup.quote"]            = { link = "@text.quote" },
+                    ["@markup.math"]             = { link = "@text.math" },
+                    ["@markup.environment"]      = { link = "@text.environment" },
+                    ["@markup.environment.name"] = { link = "@text.environment.name" },
+                    ["@markup.link.url"]         = { link = "Special" },
+                    ["@markup.link.label"]       = { link = "Identifier" },
+                    ["@comment.note"]            = { link = "@text.note" },
+                    ["@comment.warning"]         = { link = "@text.warning" },
+                    ["@comment.danger"]          = { link = "@text.danger" },
+                    ["@diff.plus"]               = { link = "@text.diff.add" },
+                    ["@diff.minus"]              = { link = "@text.diff.delete" },
                     -- NormalFloat = { bg = "none" },
-                    FloatBorder            = { bg = "none" },
-                    FloatTitle             = { bg = "none" },
+                    FloatBorder                  = { bg = "none" },
+                    FloatTitle                   = { bg = "none" },
                     -- Save an hlgroup with dark background and dimmed foreground
                     -- so that you can use it where your still want darker windows.
                     -- E.g.: autocmd TermOpen * setlocal winhighlight=Normal:NormalDark
@@ -74,44 +97,44 @@ return {
                     -- Popular plugins that open floats will link to NormalFloat by default;
                     -- set their background accordingly if you wish to keep them dark and borderless
                     -- NormalFloat            = { bg = col.sumiInk0, fg = col.oldWhite, blend = 0 },
-                    LazyNormal             = { bg = col.sumiInk0, fg = col.oldWhite },
-                    MasonNormal            = { bg = col.sumiInk0, fg = col.oldWhite },
+                    LazyNormal                   = { bg = col.sumiInk0, fg = col.oldWhite },
+                    MasonNormal                  = { bg = col.sumiInk0, fg = col.oldWhite },
 
                     -- Diagnostics and Line number columns
-                    SignColumn             = { bg = col.sumiInk1 },
-                    LineNr                 = { bg = col.sumiInk1 },
-                    DiagnosticSignWarn     = { bg = "none" },
-                    DiagnosticSignInfo     = { bg = "none" },
-                    DiagnosticSignError    = { bg = "none" },
-                    DiagnosticSignHint     = { bg = col.sumiInk1 },
+                    -- SignColumn             = { bg = col.sumiInk1 },
+                    -- LineNr                 = { bg = col.sumiInk1 },
+                    -- DiagnosticSignWarn     = { bg = "none" },
+                    -- DiagnosticSignInfo     = { bg = "none" },
+                    -- DiagnosticSignError    = { bg = "none" },
+                    -- DiagnosticSignHint     = { bg = col.sumiInk1 },
 
                     -- trouble
-                    TroubleNormal          = { bg = col.sumiInk1 },
-                    TroubleFoldIcon        = { bg = col.sumiInk1 },
-                    TroubleLocation        = { bg = "none" },
+                    TroubleNormal                = { bg = col.sumiInk1 },
+                    TroubleFoldIcon              = { bg = col.sumiInk1 },
+                    TroubleLocation              = { bg = "none" },
                     -- TroubleText     = { bg = "none" },
                     -- NoiceCmdline      = { bg = col.sumiInk3, fg = col.sumiInk3 },
-                    NoiceCmdlineIcon       = { bg = col.sumiInk1, fg = col.dragonBlue },
+                    NoiceCmdlineIcon             = { bg = col.sumiInk1, fg = col.dragonBlue },
 
-                    TelescopeTitle         = { bg = col.sumiInk2, fg = col.dragonBlue, bold = true },
-                    TelescopePromptNormal  = { bg = col.sumiInk2, fg = col.dragonBlue, bold = true },
-                    TelescopeResultsNormal = { bg = col.sumiInk2, fg = col.fujiWhite },
-                    TelescopePromptBorder  = { bg = col.sumiInk2, fg = col.sumiInk2 },
-                    TelescopeResultsBorder = { bg = col.sumiInk2, fg = col.sumiInk2, },
-                    TelescopePreviewNormal = { bg = col.sumiInk0 },
-                    TelescopePreviewBorder = { bg = col.sumiInk0, fg = col.sumiInk0 },
+                    -- TelescopeTitle         = { bg = col.sumiInk2, fg = col.dragonBlue, bold = true },
+                    -- TelescopePromptNormal  = { bg = col.sumiInk2, fg = col.dragonBlue, bold = true },
+                    -- TelescopeResultsNormal = { bg = col.sumiInk2, fg = col.fujiWhite },
+                    -- TelescopePromptBorder  = { bg = col.sumiInk2, fg = col.sumiInk2 },
+                    -- TelescopeResultsBorder = { bg = col.sumiInk2, fg = col.sumiInk2, },
+                    -- TelescopePreviewNormal = { bg = col.sumiInk0 },
+                    -- TelescopePreviewBorder = { bg = col.sumiInk0, fg = col.sumiInk0 },
 
-                    FzfLuaTitle            = { fg = col.springViolet1, bold = true },
-                    FzfLuaNormal           = { fg = col.oldWhite, bg = col.sumiInk2 },
-                    FzfLuaBorder           = { fg = col.sumiInk2, bg = col.sumiInk2 },
-                    FzfLuaCursor           = { bg = col.sumiInk4 },
-                    FzfLuaHelpNormal       = { bg = col.sumiInk1 },
-                    FzfLuaHelpBorder       = { bg = col.sumiInk1, fg = col.sumiInk1 },
-                    FzfLuaPreviewNormal    = { bg = col.sumiInk0 },
+                    FzfLuaTitle                  = { fg = col.springViolet1, bold = true },
+                    FzfLuaNormal                 = { fg = col.oldWhite, bg = col.sumiInk2 },
+                    FzfLuaBorder                 = { fg = col.sumiInk2, bg = col.sumiInk2 },
+                    FzfLuaCursor                 = { bg = col.sumiInk4 },
+                    FzfLuaHelpNormal             = { bg = col.sumiInk1 },
+                    FzfLuaHelpBorder             = { bg = col.sumiInk1, fg = col.sumiInk1 },
+                    FzfLuaPreviewNormal          = { bg = col.sumiInk0 },
 
                     -- mardkdown
-                    markdownBold           = { fg = col.waveAqua2 },
-                    markdownBoldItalic     = { fg = col.waveAqua2 },
+                    markdownBold                 = { fg = col.waveAqua2 },
+                    markdownBoldItalic           = { fg = col.waveAqua2 },
 
                 }
             end
@@ -132,9 +155,28 @@ return {
     },
     {
         'folke/tokyonight.nvim',
+        enabled = false,
         opts = {
             style = "storm",
             transparent = true
         }
     },
+    {
+        'stevedylandev/flexoki-nvim',
+        lazy = true,
+        name = 'flexoki'
+    },
+    {
+        "nyoom-engineering/oxocarbon.nvim",
+        lazy = true,
+
+    },
+    {
+        "ellisonleao/gruvbox.nvim",
+        opts = {
+            contrast = ""
+        }
+
+    }
+
 }

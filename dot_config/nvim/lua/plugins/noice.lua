@@ -1,6 +1,7 @@
 return {
     {
         "folke/noice.nvim",
+        enabled = true,
         event = "VeryLazy",
         version = "1.14.2",
         dependencies = { -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
@@ -49,14 +50,15 @@ return {
             },
             lsp = {
                 progress = {
-                    enabled = false,
+                    enabled = true,
+                    throttle = 10000/30,
                 },
                 -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-                -- override = {
-                --     ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-                --     ["vim.lsp.util.stylize_markdown"] = true,
-                --     ["cmp.entry.get_documentation"] = true,
-                -- },
+                override = {
+                    ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+                    ["vim.lsp.util.stylize_markdown"] = true,
+                    ["cmp.entry.get_documentation"] = true,
+                },
             },
             presets = {
                 long_message_to_split = true,

@@ -61,6 +61,7 @@ float_rule "app" "^Wally$"
 float_rule "app" "^Logitech.*"
 float_rule "app" "^[Rr]aycast.*"
 float_rule "title" ".*[Rr]aycast.*"
+float_rule "title" ".*[Bb]itwarden.*"
 # float_rule "title" "^New.*Message.*" # mimestream
 # float_rule "title" "^Fwd.*"          # mimestream
 # float_rule "title" "^[Rr]e.*"        # mimestream
@@ -80,8 +81,9 @@ yabai -m config window_border_width 3
 yabai -m config active_window_border_color 0xff76946A
 yabai -m config normal_window_border_color 0xff555555
 yabai -m config insert_feedback_color 0xffd75f5f
-yabai -m config split_ratio 0.50
+yabai -m config split_ratio 0.51
 yabai -m config auto_balance off
+
 yabai -m config mouse_modifier shift
 yabai -m config mouse_action1 move
 yabai -m config mouse_action2 resize

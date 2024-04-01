@@ -2,6 +2,7 @@ function set_alias
     alias nv="nvim"
     alias k="kubectl"
     alias k="kubectl"
+    alias tf="terraform"
     alias l="exa"
     alias ll="exa -l"
     alias la="exa -la"
@@ -11,20 +12,35 @@ function set_alias
     alias cm="chezmoi"
 
 end
-fish_add_path /usr/local/bin
-fish_add_path /Users/vrodriguez/.cargo/bin/
-fish_add_path /Users/vrodriguez/.local/bin
-fish_add_path /Users/vrodriguez/bin
-fish_add_path /Users/vrodriguez/.deno/bin
-fish_add_path /usr/bin
-fish_add_path bin
-fish_add_path usr/sbin
-fish_add_path sbin
-fish_add_path $(go env GOPATH)/bin
+function set_path
+    fish_add_path /usr/local/bin
+    fish_add_path /Users/vrodriguez/.cargo/bin/
+    fish_add_path /Users/vrodriguez/.local/bin
+    fish_add_path /Users/vrodriguez/bin
+    fish_add_path /Users/vrodriguez/.deno/bin
+    fish_add_path /usr/bin
+    fish_add_path bin
+    fish_add_path usr/sbin
+    fish_add_path sbin
+    # fish_add_path $(go env GOPATH)/bin
+    # fish_add_path $(rtx where golang)/packages
+end
+
+function fzf_conf
+    set -g -x FZF_CTRL_T_COMMAND 'fd -L --full-path $HOME --exclude "Library*" --exclude "Google*" --ignore-vcs'
+    set -g -x FZF_CTRL_T_OPTS "--preview '(bat -f {} || erd --icons --layout inverted --sort name --color force {}) 2> /dev/null | head -200'"
+    set -g -x FZF_ALT_C_COMMAND 'fd -L --full-path $HOME --exclude "Library*" --exclude "Google*" --ignore-vcs --type d'
+    set -g -x FZF_ALT_C_OPTS "--preview 'erd --icons --layout inverted --sort name --color force {} | head -200'"
+    set -g -x FZF_CTRL_R_OPTS "--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
+end
+
+~/.local/bin/rtx activate fish | source
 
 if status is-interactive
     # Commands to run in interactive sessions can go here
     set_alias
+    set_path
+    fzf_conf
     #Configure auto-attach/exit to your likings (default is off).
     set ZELLIJ_AUTO_ATTACH true
     set ZELLIJ_AUTO_EXIT false
@@ -48,5 +64,8 @@ if not set -q ZELLIJ
     end
 end
 
-~/.local/bin/rtx activate fish | source
+if command -q nix-your-shell
+  nix-your-shell fish | source
+end
+
 starship init fish | source

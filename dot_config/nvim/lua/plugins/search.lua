@@ -7,7 +7,7 @@ return {
     {
         "ibhagwan/fzf-lua",
         -- lazy = false,
-        enabled = true,
+        enabled = false,
         keys = {
             { "<leader><space>", fzf("buffers"),               { desc = "Switch buffers" } },
             -- {"<leader>,",  fzf(""), {desc = "Switch buffers"}},
@@ -26,8 +26,8 @@ return {
             { "<leader>hm",      fzf("man_pages"),             { desc = "Search man pages" } },
             { "<leader>hk",      fzf("keymaps"),               { desc = "Search keymaps" } },
             { "<leader>ha",      fzf("autocmds"),              { desc = "Search autocommands" } },
-            { "<leader>dd",      fzf("diagnostics_document"),  { desc = "Search diagnostics in document" } },
-            { "<leader>dD",      fzf("diagnostics_workspace"), { desc = "Search diagnostics in ws" } },
+            -- { "<leader>dd",      fzf("diagnostics_document"),  { desc = "Search diagnostics in document" } },
+            -- { "<leader>dD",      fzf("diagnostics_workspace"), { desc = "Search diagnostics in ws" } },
             { "<leader>ds",      fzf("lsp_document_symbols"),  { desc = "Document symbols" } },
             { "<leader>dS",      fzf("lsp_workspace_symbols"), { desc = "Document symbols" } },
             { "<leader>da",      fzf("lsp_code_actions"),      { desc = "Code actions" } },
@@ -56,6 +56,13 @@ return {
                     -- default = "Fuzzy grep in project"
                 }
             },
+            keymap = {
+                builtin = {
+                    ["<C-n>"] = "preview-page-down",
+                    ["<C-p>"] = "preview-page-up",
+                    -- ["<S-left>"] = "preview-page-reset",
+                }
+            },
             file_icon_padding = " ",
             file_ignore_patterns = { "lazy-%.json$" },
             previewers = {
@@ -72,10 +79,10 @@ return {
             },
             actions = {
                 files = {
-                    ["default"]   = fzf_act("file_edit"),
-                    ["ctrl-s"]    = fzf_act("file_split"),
-                    ["ctrl-v"]    = fzf_act("file_vsplit"),
-                    ["ctrl-l"]     = fzf_act("file_sel_to_qf"),
+                    ["default"] = fzf_act("file_edit"),
+                    ["ctrl-s"]  = fzf_act("file_split"),
+                    ["ctrl-v"]  = fzf_act("file_vsplit"),
+                    ["ctrl-l"]  = fzf_act("file_sel_to_qf"),
                 }
             }
         },
@@ -87,7 +94,7 @@ return {
     },
     {
         'nvim-telescope/telescope.nvim',
-        tag = '0.1.1',
+        tag = '0.1.5',
         dependencies = {
             { 'nvim-lua/plenary.nvim' },
             { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
@@ -97,36 +104,101 @@ return {
         lazy = false,
         cmd = "Telescope",
         version = false, -- Using repo HEAD
-        enabled = false,
+        enabled = true,
         keys = {
             -- special
             { "<leader><space>", tel("buffers", { show_all_buffers = true }), desc = "Switch buffer" },
             -- {"<leader>,", tel("find_files"), desc = "Find files (root dir)"},
             -- {"<leader>.", "<cmd>Telescope file_browser path=%:p:h select_buffer=true<cr>", desc = "File browser"},
             { "<leader>.",       tel("find_files", { cwd = true }),           desc = "File browser" },
-            {"<leader>/", tel('current_buffer_fuzzy_find', { previewer = false }), desc = "Search in buffer"},
-            {"<leader>;", tel("commands"), desc = "Search commands"},
-            {"<leader>:", tel("command_history"), desc = "Command History"},
-            {"<leader>'", tel("resume"), desc = "Command History"},
+            {
+                "<leader>/",
+                tel('current_buffer_fuzzy_find', { previewer = false }),
+                desc =
+                "Search in buffer"
+            },
+            {
+                "<leader>;",
+                tel("commands"),
+                desc =
+                "Search commands"
+            },
+            {
+                "<leader>:",
+                tel("command_history"),
+                desc =
+                "Command History"
+            },
+            {
+                "<leader>'",
+                tel("resume"),
+                desc =
+                "Command History"
+            },
             -- files/find
             -- {"<leader>ff", tel("find_files", { cwd = false }), desc = "Find files (cwd)"},
-            {"<leader>fr", tel("oldfiles"), desc = "Find recent files"},
-            {"<leader>fg", tel("git_files"), desc = "Find git files"},
+            {
+                "<leader>fr",
+                tel("oldfiles"),
+                desc =
+                "Find recent files"
+            },
+            {
+                "<leader>fg",
+                tel("git_files"),
+                desc =
+                "Find git files"
+            },
             -- search
-            {"<leader>sg", tel("live_grep", { cwd = false }), desc = "Search in files (cwd)"},
-            {"<leader>sG", tel("live_grep"), desc = "Search in files (root dir)"},
+            {
+                "<leader>sg",
+                tel("live_grep", { cwd = false }),
+                desc =
+                "Search in files (cwd)"
+            },
+            {
+                "<leader>sG",
+                tel("live_grep"),
+                desc =
+                "Search in files (root dir)"
+            },
             -- help
-            {"<leader>hh", tel("help_tags"), desc = "Search help pages"},
-            {"<leader>ht", tel("colorscheme", { enable_preview = true, previewer = false }), desc = "Search colorscheme"},
-            {"<leader>hm", tel("man_pages"), desc = "Search man pages"},
+            {
+                "<leader>hh",
+                tel("help_tags"),
+                desc =
+                "Search help pages"
+            },
+            {
+                "<leader>ht",
+                tel("colorscheme", { enable_preview = true, previewer = false }),
+                desc =
+                "Search colorscheme"
+            },
+            {
+                "<leader>hm",
+                tel("man_pages"),
+                desc =
+                "Search man pages"
+            },
             { "<leader>hk",  tel("keymaps"),                            desc = "Keymaps" },
             -- --dev
-            { "<leader>dd",  tel("diagnostics", { previewer = false }), desc = "Diagnostics" },
-            { "<leader>da",  tel("actions", { previewer = false }),     desc = "Code actions" },
+            -- { "<leader>dd",  tel("diagnostics", { previewer = false }), desc = "Diagnostics" },
+            -- { "<leader>da",  tel("actions", { previewer = false }),     desc = "Code actions" },
             { "<leader>ds",  tel("lsp_document_symbols"),               desc = "Goto symbol" },
             { "<leader>dws", tel("lsp_wokspace_symbols"),               desc = "Goto symbol" },
-            {"gd", tel("lsp_definitions"), desc = "Goto definition"},
-            {"gr", tel("lsp_references"), desc = "Goto references"},
+            {
+                "gd",
+                tel("lsp_definitions"),
+                desc =
+                "Goto definition"
+            },
+            {
+                "gr",
+                tel("lsp_references"),
+                desc =
+                "Goto references"
+            },
         },
         opts = {
             defaults = {

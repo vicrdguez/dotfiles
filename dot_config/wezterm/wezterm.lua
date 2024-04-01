@@ -11,9 +11,14 @@ if wezterm.config_builder then
 end
 
 local function scheme_for_appearance(appearance)
-
     if appearance:find "Dark" then
-        return "Catppuccin Mocha"
+        local scheme = wezterm.get_builtin_color_schemes()["Catppuccin Mocha"]
+        scheme.background = "#1f1f28" -- kanagawa background
+        config.color_schemes = {
+            ['Catppuccin Custom Mocha'] = scheme
+        }
+
+        return "Catppuccin Custom Mocha"
     else
         return "Catppuccin Latte"
     end
@@ -23,10 +28,14 @@ end
 
 -- [[appearance
 -- config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
-local kanagawa = require("kanagawa")
-config.force_reverse_video_cursor = kanagawa.force_reverse_video_cursor
-config.colors = kanagawa.colors
--- config.color_scheme = 'Kanagawa (Gogh)'
+-- config.color_scheme = 'Gruvbox Dark (Gogh)'
+-- Kanagawa theme
+config.colors = require("kanagawa").dragon
+-- config.color_scheme = "Oxocarbon Dark"
+-- config.color_scheme = "Flexoki Dark"
+
+config.force_reverse_video_cursor = true
+
 config.enable_tab_bar = false
 config.window_decorations = "RESIZE"
 config.window_padding = {
@@ -58,7 +67,7 @@ config.mouse_bindings = {
 
 -- Using fish shell
 -- Spawn a fish shell in login mode
-config.default_prog = { '/usr/local/bin/fish', '-l' }
+config.default_prog = { '/Users/vrodriguez/.nix-profile/bin/fish', '-l' }
 
 -- and finally, return the configuration to wezterm
 return config

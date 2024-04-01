@@ -31,6 +31,12 @@ nmap("<leader>wl", "<C-w>l")
 nmap("<leader>wh", "<C-w>h")
 nmap("<leader>wk", "<C-w>k")
 nmap("<leader>wj", "<C-w>j")
+
+nmap("<C-l>", "<C-w>l")
+nmap("<C-h>", "<C-w>h")
+nmap("<C-k>", "<C-w>k")
+nmap("C-j>", "<C-w>j")
+
 nmap("<leader>wv", "<C-w>v<C-w>l")
 nmap("<leader>ws", "<C-w>s<C-w>j")
 nmap("<leader>wc", "<C-w>c")
@@ -68,6 +74,7 @@ nmap("<leader>j", "<cmd>lprev<CR>zz")
 -- Lets you replace the word you have the cursor on
 nmap("<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
+
 -- Makes a file executagle without leaving vim
 -- nmap("<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
@@ -76,6 +83,8 @@ nmap("<leader>xs", function ()
     require("luasnip").cleanup()
     R("custom.snippets")
 end)
+
+nmap("gx", ":silent !open <cWord><cr>")
 
 
 -- nmap("<leader>wr", utils.resetConfig)

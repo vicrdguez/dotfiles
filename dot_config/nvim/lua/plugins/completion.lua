@@ -29,8 +29,10 @@ return {
                 return cmp.mapping(function(fallback)
                     if ls.expand_or_jumpable() then
                         ls.expand_or_jump()
+                        P("expand or jump")
                     elseif cmp.visible() then
                         cmp.select_prev_item(select_opts)
+                        P("select prev")
                     else
                         fallback()
                     end
@@ -79,7 +81,7 @@ return {
                 },
                 -- Keymaps for completion related stuff
                 mapping = {
-                    -- ["<C-f>"] = cmp_action.luasnip_next_or_expand(),
+                    -- ["<C-f>"] = cmp_action.luasnip_next_or_expand(), 
                     -- ["<C-b>"] = cmp_action.luasnip_jump_backward(),
                     -- ["<Tab>"] = cmp_action.luasnip_supertab(),
                     -- ["<S-Tab>"] = cmp_action.luasnip_shift_supertab(),

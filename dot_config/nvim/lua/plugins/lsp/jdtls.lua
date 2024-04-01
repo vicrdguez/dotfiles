@@ -9,14 +9,36 @@ local augroup = custom.augroup
 
 local M = {}
 local cache_vars = {}
-local root_markers = { ".gradle", "gradlew", ".git", "pom.xml" }
+local root_markers = { ".gradle", "gradlew", ".git", "pom.xml", "mvnw" }
 local mason_registry = require("mason-registry")
 
 local home = os.getenv("HOME")
--- using rtx to multi-verion java
-local java_install_path = home .. ".local/share/rtx/installs/java/"
+-- using mise to multi-verion java
+local java_install_path = home .. "/.local/share/mise/installs/java/"
 --/Users/vrodriguez/.local/share/rtx/installs/java/temurin-17.0.6+10/bin/java
+local java_8_version
+local java_11_version
+local java_17_version
+local java_21_version
 
+function M.get_java_versions()
+    local output = vim.fn.json_decode(vim.fn.systemlist({"mise", "list", "java", "--json"}))
+    for _, java in pairs(output) do
+        if string.find(java.version, "-8.") then
+            java_8_version = java.version
+        elseif string.find(java.version, "-11.") then
+            java_11_version = java.version
+        elseif string.find(java.version, "-17.") then
+            java_17_version = java.version
+        elseif string.find(java.version, "-21.") then
+            java_21_version = java.version
+        end
+    end
+    print("java 8: "..java_8_version)
+    print("java 11: "..java_11_version)
+    print("java 17: "..java_17_version)
+    print("java 21: "..java_21_version)
+end
 local function get_jdtls_paths(jdtls)
     if cache_vars.paths then
         return cache_vars.paths
@@ -61,18 +83,19 @@ local function get_jdtls_paths(jdtls)
         vim.list_extend(path.bundles, vscode_java_bundle)
     end
 
+    M.get_java_versions()
     path.runtimes = {
         {
             name = "JavaSE-1.8",
-            path = java_install_path .. "temurin-8.0.362+9",
+            path = java_install_path .. java_8_version,
         },
         {
             name = "JavaSE-11",
-            path = java_install_path .. "temurin-11.0.18+10",
+            path = java_install_path .. java_11_version,
         },
         {
             name = "JavaSE-17",
-            path = java_install_path .. "temurin-17.0.6+10",
+            path = java_install_path .. java_17_version,
             default = true,
         },
     }
