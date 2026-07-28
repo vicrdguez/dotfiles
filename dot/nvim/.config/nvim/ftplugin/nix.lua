@@ -1,0 +1,28 @@
+---- Exit if the language server isn't available
+--local lib = require('lib.lsp')
+--if not lib.is_ls_present('nixd') then return end
+--local lsp_util = require('lspconfig.util')
+--
+--local root_pattern = lsp_util.root_pattern(unpack {
+--  'flake.nix',
+--  'default.nix',
+--  'shell.nix',
+--  '.nixd.json'
+--})
+--
+--
+--
+--require('lspconfig').nixd.setup {
+--    root_dir = function(fname)
+--        return root_pattern(fname) or lsp_util.find_git_ancestor(fname)
+--    end,
+--    single_file_support = true,
+--}
+--vim.lsp.start {
+--  name = 'nil_ls',
+--  cmd = { 'nil' },
+--  root_dir = vim.fs.dirname(vim.fs.find(root_files, { upward = true })[1]),
+--  capabilities = require('lib.lsp').make_client_capabilities(),
+--}
+--
+vim.bo.commentstring = '#%s'

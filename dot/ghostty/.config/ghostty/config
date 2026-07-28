@@ -1,0 +1,9 @@
+theme = vague
+window-subtitle = false
+window-decoration = none
+macos-titlebar-style = hidden
+background-opacity = 1
+font-size = 18
+font-family = Iosevka
+
+
