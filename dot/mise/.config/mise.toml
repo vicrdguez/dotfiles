@@ -31,6 +31,7 @@ fzf = "latest"
 zellij = "latest"
 pi = "latest"
 direnv = "latest"
+eza = "latest"
 
 [shell_alias]
 dotfiles = "cd ~/dev/toolbox/dotfiles"

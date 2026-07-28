@@ -13,8 +13,8 @@ status is-interactive; and begin
     # Abbreviations
 
     # Aliases
-    alias la 'exa -la'
-    alias ll 'exa -l'
+    alias la 'eza -la'
+    alias ll 'eza -l'
     alias mvn mvnd
     alias nv nvim
     alias tf terraform
@@ -30,7 +30,7 @@ status is-interactive; and begin
     eval (zellij setup --generate-auto-start fish | string collect)
 
     if test "$TERM" != dumb
-        /nix/store/p8nlvjiazzxrk9q5nrrp52g71wl5hly1-starship-1.24.2/bin/starship init fish | source
+        starship init fish | source
 
     end
 
@@ -44,7 +44,7 @@ status is-interactive; and begin
         set fish_complete_path $prev "/Users/vrod/.local/share/fish/home-manager/generated_completions" $post
     end
 
-    /nix/store/91q05bqw755yg3whqg1vhqi1v6glaxl3-direnv-2.37.1/bin/direnv hook fish | source
+    direnv hook fish | source
 
 end
 
