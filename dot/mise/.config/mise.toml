@@ -26,9 +26,14 @@ gh = "latest"
 "github:neovim/neovim" = "nightly"
 tree-sitter = "0.26.3"
 uv = "latest"
+startship = "latest"
+fzf = "latest"
+zellij = "latest"
+pi = "latest"
+direnv = "latest"
 
 [shell_alias]
-sysfiles = "cd ~/dev/toolbox/sysfiles"
+dotfiles = "cd ~/dev/toolbox/dotfiles"
 #
 # # newest with this prefix (typically exact matches don't use the prefix)
 # go = 'prefix:1.16'

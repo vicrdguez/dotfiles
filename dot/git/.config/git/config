@@ -1,0 +1,56 @@
+[alias]
+	b = "branch"
+	bc = "branch --contains"
+	bd = "branch --delete --force"
+	bl = "branch -vv"
+	c = "commit -e"
+	cc = "commit -c"
+	cl = "clone"
+	co = "checkout"
+	cob = "checkout -b"
+	d = "diff -c"
+	f = "fetch --tags"
+	l = "log --pretty=lc --graph"
+	la = "log --pretty=lc --graph --all"
+	lg = "log --pretty=lc --graph --branches=* --tags=* --remotes=origin --remotes=upstream"
+	m = "merge"
+	ma = "merge --abort"
+	mc = "merge --continue"
+	nuke = "!git reset --hard HEAD && git clean -fd"
+	p = "pull"
+	pu = "push"
+	puff = "push --force"
+	r = "rebase"
+	ra = "rebase --abort"
+	rc = "rebase --continue"
+	ri = "rebase --interactive"
+	rq = "rebase --quit"
+	rs = "rebase --skip"
+	s = "status"
+	sa = "status --ignored --untracked-files"
+	si = "status --ignored"
+	sl = "stash list --pretty=rlc"
+	sw = "switch"
+	swc = "switch -c"
+	which = "branch --all --contains"
+	which-tag = "describe --always --contains"
+	who = "shortlog --summary --numbered --no-merges"
+	whoami = "!echo $(git config --get user.name) '<'$(git config --get user.email)'>'"
+
+[format]
+	pretty = "lf"
+
+[init]
+	defaultBranch = "main"
+
+[pretty]
+	lc = "format:%C(auto)%h%C(reset) %C(white)-%C(reset) %C(italic blue)%ad%C(reset) %C(italic cyan)(%ar)%C(reset)%C(auto)%d%C(reset)%n %C(white)⤷%C(reset) %s %C(241)- %aN <%aE>%C(reset)%n"
+	lf = "format:%C(auto)%h%C(reset)%C(auto)%d%C(reset)   %C(italic 239)[P: %p] [T: %t]%C(reset)%n%C(white)Author:%C(reset)   %aN %C(241)<%aE>%C(reset)%n          %C(italic blue)%ad%C(reset) %C(italic cyan)(%ar)%C(reset)%n%C(white)Commit:%C(reset)   %cN %C(241)<%cE>%C(reset)   %C(italic 239)[GPG: %G?% GK]%C(reset)%n          %C(italic blue)%cd%C(reset) %C(italic cyan)(%cr)%C(reset)%w(0,4,4)%n%n%C(bold)%s%C(reset)%n%n%-b%n%n%-N%n"
+
+[push]
+	autoSetupRemote = true
+
+[user]
+	email = "contact@vicrodriguez.dev"
+	name = "vicrdguez"
+
