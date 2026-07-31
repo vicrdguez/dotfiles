@@ -27,7 +27,9 @@ status is-interactive; and begin
     set -g fish_color_command green
 
     ~/.local/bin/mise activate fish | source
-    eval (zellij setup --generate-auto-start fish | string collect)
+    zoxide init fish | source
+    # eval (zellij setup --generate-auto-start fish | string collect)
+    # herdr
 
     if test "$TERM" != dumb
         starship init fish | source

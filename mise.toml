@@ -1,7 +1,0 @@
-# [tools."http:stow"]
-# version = "latest"
-# url = "https://ftp.gnu.org/gnu/stow/stow-latest.tar.gz"
-# version_list_url = "https://ftp.gnu.org/gnu/stow/"
-# version_regex = 'stow-(\d+\.\d+\.\d+)\.tar\.gz'
-[tools]
-"http:lnko" = { version = "0.2.2", url = "https://github.com/luanvil/lnko/releases/download/v{{version}}/lnko-darwin_arm64", bin = "lnko" }

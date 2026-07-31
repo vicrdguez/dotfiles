@@ -68,15 +68,15 @@ require('vague').setup {
 
   on_highlights = function(hl, col)
     -- [[Mini statusline]]
-    hl.MiniStatuslineModeNormal = { bg = col.search, fg = col.bg, gui = 'bold' }
-    hl.MiniStatuslineModeReplace = { bg = col.error, fg = col.bg, gui = 'bold' }
-    hl.MiniStatuslineModeVisual = { bg = col.hint, fg = col.bg, gui = 'bold' }
-    hl.MiniStatuslineModeInsert = { bg = col.string, fg = col.bg, gui = 'bold' }
-    hl.MiniStatuslineModeCommand = { bg = col.type, fg = col.bg, gui = 'bold' }
-    hl.VicMiniStatuslineGitBranch = { bg = col.func, fg = col.bg, gui = 'bold' }
-    hl.VicMiniStatuslineLSP = { fg = col.delta, gui = 'bold' }
-    hl.DiagnosticHintBold = { fg = col.hint, gui = 'bold' }
-    hl.DiagnosticOkBold = { fg = col.plus, gui = 'bold' }
-    hl.DiagnosticInfoNonItalic = { fg = col.constant, gui = 'bold' }
+    hl.MiniStatuslineModeNormal = { bg = col.search, fg = col.bg, bold = true }
+    hl.MiniStatuslineModeReplace = { bg = col.error, fg = col.bg, bold = true }
+    hl.MiniStatuslineModeVisual = { bg = col.hint, fg = col.bg, bold = true }
+    hl.MiniStatuslineModeInsert = { bg = col.string, fg = col.bg, bold = true }
+    hl.MiniStatuslineModeCommand = { bg = col.type, fg = col.bg, bold = true }
+    hl.VicMiniStatuslineGitBranch = { bg = col.func, fg = col.bg, bold = true }
+    hl.VicMiniStatuslineLSP = { fg = col.delta, bold = true }
+    hl.DiagnosticHintBold = { fg = col.hint, bold = true }
+    hl.DiagnosticOkBold = { fg = col.plus, bold = true }
+    hl.DiagnosticInfoNonItalic = { fg = col.constant, bold = true }
   end,
 }
