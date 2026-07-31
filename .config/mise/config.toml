@@ -11,8 +11,10 @@ dotfiles.root = "~/.dotfiles"
 "~/.config/git" = {}
 "~/.config/mise" = {}
 "~/.config/nvim" = {}
+"~/.config/ghostty" = {}
 #"~/.config/zellij" = {}
 "~/.config/herdr" = { mode = "symlink-each"}
+"~/.config/wezterm" = {}
 
 [shell_alias]
 # Mise command is too long
