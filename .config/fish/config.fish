@@ -10,6 +10,8 @@ end
 
 status is-interactive; and begin
 
+    # Path
+    fish_add_path $GOBIN
     # Abbreviations
 
     # Aliases
