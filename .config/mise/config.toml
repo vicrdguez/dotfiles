@@ -1,18 +1,24 @@
 [settings]
 dotfiles.root = "~/.dotfiles"
 
+[bootstrap.packages]
+"brew:fish" = "latest"
+"brew:markdown-oxide" = "latest"
+
 [bootstrap.repos]
-"~/./dotfiles" = { url = "https://github.com/vicrdguez/dotfiles.git", ref = "main" }
+"~/.dotfiles" = { url = "https://github.com/vicrdguez/dotfiles.git", ref = "main" }
 
 [dotfiles]
 "~/.config/aerospace" = {}
 "~/.config/fish" = {}
 "~/.config/starship.toml" = {}
 "~/.config/git" = {}
+# clean copy to avoid auto-hooks
+"~/.config/git/myconfig" = { source = "~/.dotfiles/.config/git/config", mode = "copy"}
 "~/.config/mise" = {}
 "~/.config/nvim" = {}
 "~/.config/ghostty" = {}
-#"~/.config/zellij" = {}
+"~/.config/zellij" = {}
 "~/.config/herdr" = { mode = "symlink-each"}
 "~/.config/wezterm" = {}
 
@@ -20,6 +26,7 @@ dotfiles.root = "~/.dotfiles"
 # Mise command is too long
 dot = "mise bootstrap dotfiles"
 miseconf = "nvim ~/.config/mise/config.toml"
+zl = "zellij"
 # dotfiles = "cd ~/dev/toolbox/dotfiles"
 
 [tools]
@@ -36,6 +43,13 @@ eza = "latest"
 zoxide = "latest"
 herdr = "latest"
 lazygit = "latest"
+"github:agavra/tuicr" = "latest"
+opencode = "latest"
+"npm:typescript-language-server" = "latest"
+
+[env]
+OPENCODE_DISABLE_CLAUDE_CODE = "1"
+OPENCODE_DISABLE_LSP_DOWNLOAD = "true"
 #
 # # newest with this prefix (typically exact matches don't use the prefix)
 # go = 'prefix:1.16'
