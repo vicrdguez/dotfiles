@@ -8,6 +8,6 @@ window-padding-balance = true
 background-opacity = 1
 font-size = 16
 font-family = "Iosevka"
-command = ~/.local/share/mise/shims/herdr
+command = /opt/homebrew/bin/fish
 shell-integration = fish
 
