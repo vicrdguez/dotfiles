@@ -12,7 +12,7 @@ dotfiles.root = "~/.dotfiles"
 "~/.config/aerospace" = {}
 "~/.config/fish" = {}
 "~/.config/starship.toml" = {}
-"~/.config/git" = {}
+"~/.config/git/config" = {}
 # clean copy to avoid auto-hooks
 "~/.config/git/myconfig" = { source = "~/.dotfiles/.config/git/config", mode = "copy"}
 "~/.config/mise" = {}
