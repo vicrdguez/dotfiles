@@ -53,32 +53,3 @@
 [user]
 	email = "contact@vicrodriguez.dev"
 	name = "vicrdguez"
-
-[url "https://localhost/ STOP STOP STOP DO NOT PROCEED, ALL PUBLIC PUSH ACCESS IS BLOCKED, see go/github-push-block for details - "]
-	pushInsteadOf = git@github.com:
-	pushInsteadOf = https://github.com/
-[url "git@github.com:confluentinc/"]
-	pushInsteadOf = git@github.com:confluentinc/
-	pushInsteadOf = git@github.com:confluentinc/
-	pushInsteadOf = https://github.com/confluentinc/
-	pushInsteadOf = https://github.com/confluentinc/
-[url "git@github.com:confluent-partners/"]
-	pushInsteadOf = git@github.com:confluent-partners/
-	pushInsteadOf = git@github.com:confluent-partners/
-	pushInsteadOf = https://github.com/confluent-partners/
-	pushInsteadOf = https://github.com/confluent-partners/
-[url "git@github.com:confluentdev/"]
-	pushInsteadOf = git@github.com:confluentdev/
-	pushInsteadOf = git@github.com:confluentdev/
-	pushInsteadOf = https://github.com/confluentdev/
-	pushInsteadOf = https://github.com/confluentdev/
-[url "git@github.com:confluentfederal/"]
-	pushInsteadOf = git@github.com:confluentfederal/
-	pushInsteadOf = git@github.com:confluentfederal/
-	pushInsteadOf = https://github.com/confluentfederal/
-	pushInsteadOf = https://github.com/confluentfederal/
-[url "git@github.com:warpstreamlabs/"]
-	pushInsteadOf = git@github.com:warpstreamlabs/
-	pushInsteadOf = git@github.com:warpstreamlabs/
-	pushInsteadOf = https://github.com/warpstreamlabs/
-	pushInsteadOf = https://github.com/warpstreamlabs/
