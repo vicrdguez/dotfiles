@@ -1,0 +1,7 @@
+# Keep credentials, installed packages, and runtime state out of this repository.
+/*
+!/.gitignore
+!/settings.json
+!/prompts/
+!/extensions/
+!/skills/

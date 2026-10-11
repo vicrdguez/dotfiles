@@ -1,0 +1,26 @@
+{
+  "theme": "dark",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-6.1-sol",
+  "defaultThinkingLevel": "medium",
+  "defaultTools": [
+    "+codemode"
+  ],
+  "packages": [
+    "npm:pi-web-access",
+    "npm:@ff-labs/pi-fff",
+    "npm:@aliou/pi-guardrails",
+    "npm:@tintinweb/pi-subagents",
+    "npm:pi-zentui",
+    "npm:@lll9p/pi-better-compaction"
+  ],
+  "hideThinkingBlock": false,
+  "enabledModels": [
+    "deepseek/deepseek-flash",
+    "openai-codex/gpt-6-astra",
+    "openai-codex/gpt-6-sol",
+    "openai-codex/gpt-6-luna",
+    "zai/glm-5.3",
+    "openai-codex/gpt-6.1-sol"
+  ]
+}
