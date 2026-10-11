@@ -1,9 +1,9 @@
 -- Custom options for writing typst to my liking
-vim.opt.textwidth = 100
-vim.opt.formatoptions = 'jtcroql'
-vim.opt.wrap = true
-vim.opt.linebreak = true
-vim.opt.breakindent = true
+vim.opt_local.textwidth = 100
+vim.opt_local.formatoptions = 'jtcroql'
+vim.opt_local.wrap = true
+vim.opt_local.linebreak = true
+vim.opt_local.breakindent = true
 
 local img = require('lib.images')
 

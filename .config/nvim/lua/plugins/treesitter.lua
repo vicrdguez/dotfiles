@@ -1,19 +1,24 @@
--- Seems that setup is not really needed for this plugin anymore
+-- No setup() on the main branch: install() is the whole API. It's async and a
+-- no-op for parsers already present. Parsers and queries land in
+-- stdpath("data")/site/{parser,queries}, which is already on runtimepath.
 --
--- require('nvim-treesitter').setup {
---     -- All grammars are alredy installed by nix
---     auto_install = false,
---     highlight = {
---         enable = true,
---         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
---         -- If you are experiencing weird indenting issues, add the language to
---         -- the list of additional_vim_regex_highlighting and disabled languages for indent.
---         additional_vim_regex_highlighting = { 'ruby' },
---     },
---     indent = {
---         enable = true,
---         -- Following the example above
---         disable = { 'ruby' }
---     },
--- }
---
+-- Only c/diff/lua/markdown/markdown_inline/query/vim/vimdoc ship with the nvim
+-- binary, so without this every fenced code block in another language renders
+-- as flat uncolored text.
+require("nvim-treesitter").install({
+    "bash",
+    "css",
+    "dockerfile",
+    "fish",
+    "go",
+    "html",
+    "javascript",
+    "json",
+    "nix",
+    "python",
+    "rust",
+    "sql",
+    "toml",
+    "typescript",
+    "yaml",
+})

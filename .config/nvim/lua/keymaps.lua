@@ -21,11 +21,12 @@ nmap("<leader>wf", "<C-w>|", { desc = "" })
 nmap("[d", function()
 	vim.diagnostic.jump({ count = -1, float = true })
 end, { desc = "Go to previous [D]iagnostic message" })
+
 nmap("]d", function()
 	vim.diagnostic.jump({ count = 1, float = true })
 end, { desc = "Go to next [D]iagnostic message" })
-nmap("<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
-nmap("<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+
+nmap("<leader>q", vim.diagnostic.setqflist, { desc = "Open diagnostic [Q]uickfix list" })
 -- Paste over selection without overriding the vim paste register with the
 -- substituted string. Doing so by yanking into the void register
 map("x", "<leader>p", [["_dP]])
@@ -45,6 +46,10 @@ map("v", "K", ":m '<-2<CR>gv=gv")
 -- Joining lines keeps cursor in its position
 nmap("J", "mzJ`z")
 
+-- Better indent commands
+map("v", "<", "<gv", { desc = "Unindent and keep selection"})
+map("v", ">", ">gv", { desc = "Indent and keep selection"})
+
 -- Moving through visual lines
 -- The mapped expression respects line count movements
 map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
@@ -60,3 +65,9 @@ nmap("<C-d>", "<C-d>zz", { desc = "Jump down with cursor in the middle of the sc
 nmap("<C-u>", "<C-u>zz", { desc = "Jump up with cursor in the middle of the screen" })
 nmap("n", "nzzzv")
 nmap("N", "Nzzzv")
+
+-- Rename word under cursor
+nmap("<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], {desc = "Replace word under cursor"})
+
+-- Native undotree
+nmap('<leader>u', require('undotree').open, {desc = 'toggle bultin undotree'})

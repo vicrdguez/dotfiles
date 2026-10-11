@@ -5,6 +5,10 @@
       "src": "https://github.com/saghen/blink.cmp",
       "version": "'v1.8.0'"
     },
+    "bullets.vim": {
+      "rev": "81570b98ca44b4100b3ddcf8d9ca74b9a9b0c884",
+      "src": "https://github.com/bullets-vim/bullets.vim"
+    },
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
       "src": "https://github.com/stevearc/conform.nvim"
@@ -14,7 +18,7 @@
       "src": "https://github.com/dlyongemallo/diffview-plus.nvim"
     },
     "fyler.nvim": {
-      "rev": "bc1f8e420f566dd3b3db1f0aff2e6932947bdd71",
+      "rev": "322c79d446884e9939a958294e6108ae8cfbdb12",
       "src": "https://github.com/FylerOrg/fyler.nvim"
     },
     "fzf-lua": {
@@ -22,7 +26,7 @@
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "mini.nvim": {
-      "rev": "946ae64e0ee807ae3c41f382f0114b4ed4915b2c",
+      "rev": "bcb4b2688b38f5c48ada025abe130d41840e11d5",
       "src": "https://github.com/nvim-mini/mini.nvim"
     },
     "no-neck-pain.nvim": {
@@ -30,12 +34,16 @@
       "src": "https://github.com/shortcuts/no-neck-pain.nvim"
     },
     "nvim-treesitter": {
-      "rev": "61df84986b4b4ec469ee745a182e433d49f8c27e",
+      "rev": "7b6cc8949f9999c5ed91436cbe24aa5f99c42025",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter"
     },
     "oil.nvim": {
       "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
       "src": "https://github.com/stevearc/oil.nvim"
+    },
+    "render-markdown.nvim": {
+      "rev": "f422cb5c6855f150e2ddcfaf44e7157b98b34f6a",
+      "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "touchup.nvim": {
       "rev": "9410a8640262f9b43ce04b0779d2c66134ae311b",

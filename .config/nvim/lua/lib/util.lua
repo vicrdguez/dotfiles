@@ -35,7 +35,8 @@ function M.get_root()
   ---@type string[]
   local roots = {}
   if path then
-    for _, client in pairs(vim.lsp.get_active_clients { bufnr = 0 }) do
+    -- get_active_clients was dropped in 0.13
+    for _, client in pairs(vim.lsp.get_clients { bufnr = 0 }) do
       local workspace = client.config.workspace_folders
       local paths = workspace
           and vim.tbl_map(function(ws)
@@ -72,11 +73,7 @@ function M.setColor(color)
 end
 
 function M.map(mode, lhs, rhs, opts)
-  opts = opts or {}
-  if not opts.silent then
-    opts.silent = false
-  end
-  vim.keymap.set(mode, lhs, rhs, opts)
+  vim.keymap.set(mode, lhs, rhs, opts or {})
 end
 
 function M.nmap(lhs, rhs, opts)

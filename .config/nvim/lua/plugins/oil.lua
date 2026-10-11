@@ -13,7 +13,7 @@ local opts = {
 -- [[ keymaps ]]
 --
 
-nmap('<leader>f.', require('oil').open, { desc = 'Open Oil file browser' })
-nmap('<leader>ff', require('oil').open_float, { desc = 'Open Oil file browser in a floating window' })
-
-require('oil').setup(opts)
+-- nmap('<leader>f.', require('oil').open, { desc = 'Open Oil file browser' })
+-- nmap('<leader>ff', require('oil').open_float, { desc = 'Open Oil file browser in a floating window' })
+--
+-- require('oil').setup(opts)
