@@ -30,6 +30,7 @@ zl = "zellij"
 # dotfiles = "cd ~/dev/toolbox/dotfiles"
 
 [tools]
+node = "lts"
 gh = "latest"
 neovim = "nightly"
 tree-sitter = "latest"
