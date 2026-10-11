@@ -8,6 +8,40 @@ dotfiles.root = "~/.dotfiles"
 [bootstrap.repos]
 "~/.dotfiles" = { url = "https://github.com/vicrdguez/dotfiles.git", ref = "main" }
 
+# macOS preferences: apply with mise bootstrap --only macos-defaults
+[bootstrap.macos.dock]
+autohide = true
+mru_spaces = false
+
+[bootstrap.macos.defaults."com.apple.dock"]
+expose-animation-duration = 0.0
+
+# Each display has separate Spaces; requires logging out and back in.
+[bootstrap.macos.defaults."com.apple.spaces"]
+spans-displays = false
+
+[bootstrap.macos.finder]
+show_all_files = true
+
+[bootstrap.macos.defaults."com.apple.finder"]
+AppleShowAllExtensions = true
+
+[bootstrap.macos.defaults.NSGlobalDomain]
+AppleShowAllExtensions = true
+AppleInterfaceStyle = "Dark"
+NSUseAnimatedFocusRing = false
+NSWindowShouldDragOnGesture = true
+
+# macOS may require enabling this manually in Accessibility > Display.
+[bootstrap.macos.defaults."com.apple.universalaccess"]
+reduceMotion = true
+
+# Caps Lock -> Control is configured manually in System Settings.
+[bootstrap.macos.keyboard]
+initial_key_repeat = 14
+key_repeat = 1
+press_and_hold = false
+
 [dotfiles]
 "~/.config/aerospace" = {}
 "~/.config/fish" = {}
