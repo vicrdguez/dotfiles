@@ -91,6 +91,7 @@ opencode = "latest"
 [env]
 OPENCODE_DISABLE_CLAUDE_CODE = "1"
 OPENCODE_DISABLE_LSP_DOWNLOAD = "true"
+GIT_CONFIG_GLOBAL = "{{ env.HOME }}/.config/git/cleanconfig"
 #
 # # newest with this prefix (typically exact matches don't use the prefix)
 # go = 'prefix:1.16'
