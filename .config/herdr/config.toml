@@ -80,50 +80,55 @@ settings = "prefix+;"
 # detach = "prefix+q"
 # reload_config = "prefix+shift+r"
 # open_notification_target = "prefix+o"
-# workspace_picker = "prefix+w"
-# goto = "prefix+g"
-# new_workspace = "prefix+shift+n"
+workspace_picker = "prefix+w"
+goto = "prefix+g"
+new_workspace = "prefix+c"
 # new_worktree = "prefix+shift+g"
 # open_worktree = ""    # optional, unset by default
 # remove_worktree = ""  # optional, unset by default; opens confirmation
 # rename_workspace = "prefix+shift+w"
-close_workspace = "prefix+shift+x"
+close_workspace = "prefix+shift+d"
 # previous_workspace = "" # optional, unset by default
 # next_workspace = ""     # optional, unset by default
 # previous_agent = ""     # optional, unset by default
 # next_agent = ""         # optional, unset by default
 # focus_agent = ""        # optional indexed binding, e.g. "prefix+alt+1..9"
 # remote_image_paste = "ctrl+v" # only active in herdr --remote; empty disables raw-key image paste
-# new_tab = "prefix+c"
+new_tab = "prefix+shift+n"
 # rename_tab = "prefix+shift+t"
-# previous_tab = "prefix+p"
-# next_tab = "prefix+n"
-# switch_tab = "prefix+1..9"
+previous_tab = "prefix+shift+h"
+next_tab = "prefix+shift+l"
+switch_tab = "prefix+1..9"
 # switch_workspace = ""   # optional indexed binding, e.g. "prefix+shift+1..9"
-# close_tab = "prefix+shift+x"
+close_tab = "prefix+shift+x"
 # rename_pane = "prefix+shift+p"
-# edit_scrollback = "prefix+e"
-# focus_pane_left = "prefix+h"
-# focus_pane_down = "prefix+j"
-# focus_pane_up = "prefix+k"
-# focus_pane_right = "prefix+l"
+edit_scrollback = "prefix+e"
+copy_mode = "prefix+s"
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+swap_pane_left = "prefix+ctrl+h"
+swap_pane_down = "prefix+ctrl+j"
+swap_pane_up = "prefix+ctrl+k"
+swap_pane_right = "prefix+ctrl+l"
 # cycle_pane_next = "prefix+tab"
 # cycle_pane_previous = "prefix+shift+tab"
-# last_pane = ""          # optional, unset by default; bind e.g. "prefix+tab" for global back-and-forth
-# split_vertical = "prefix+v"
-# split_horizontal = "prefix+minus"
-# close_pane = "prefix+x"
-zoom = "prefix+f"       # legacy alias: fullscreen
-# resize_mode = "prefix+r"
+last_pane = "prefix+p"
+split_vertical = "prefix+n"
+split_horizontal = "prefix+d"
+close_pane = "prefix+x"
+zoom = "prefix+f"
+resize_mode = "prefix+r"
 # toggle_sidebar = "prefix+b"
 
 # Navigate-mode movement. These local shortcuts win while navigate mode is open.
 # They are independent from focus_pane_*. Do not include prefix+, esc, enter, tab, or 1..9 here.
-navigate_workspace_up = "p"
-navigate_workspace_down = "n"
+navigate_workspace_up = "k"
+navigate_workspace_down = "j"
 navigate_pane_left = "h"      # left arrow always focuses the pane to the left
-navigate_pane_down = "j"
-navigate_pane_up = "k"
+navigate_pane_down = "down"
+navigate_pane_up = "up"
 navigate_pane_right = "l"     # right arrow always focuses the pane to the right
 
 # Custom commands use the same binding syntax.
@@ -131,7 +136,7 @@ navigate_pane_right = "l"     # right arrow always focuses the pane to the right
 # type = "pane" opens a temporary pane and closes it when the command exits.
 # On Windows, command strings run through cmd.exe /d /c.
 [[keys.command]]
-key = "prefix+alt+g"
+key = "prefix+ctrl+g"
 type = "popup"
 command = "lazygit"
 width = "80%"
@@ -200,7 +205,7 @@ height = "80%"
 
 # Ask for a tab name before creating a new tab.
 # Set false to create tabs immediately with generated names.
-# prompt_new_tab_name = true
+prompt_new_tab_name = false
 
 # Draw borders around split panes.
 pane_borders = true
