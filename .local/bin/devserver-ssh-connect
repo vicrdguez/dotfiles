@@ -1,0 +1,27 @@
+#!/bin/sh
+# macOS SSH ProxyCommand: prefer LAN only when its host key matches devserver.
+# OpenSSH must still enforce the trusted key on the resulting connection.
+set -eu
+
+[ "$#" -eq 0 ] || { echo 'Usage: devserver-ssh-connect' >&2; exit 2; }
+lan=192.168.1.159
+tailnet=100.103.159.2
+expected='SHA256:0iOotxJar1JVEx93Gg/VzeAgoX+UObnq/sBLduz/yY8'
+
+# Scanned keys are untrusted: compare their fingerprint, never install them.
+lan_keys=$(/usr/bin/ssh-keyscan -4 -T 2 -p 22 -t ed25519 "$lan" 2>/dev/null) || lan_keys=''
+fingerprints=$(printf '%s\n' "$lan_keys" |
+    /usr/bin/ssh-keygen -l -E sha256 -f - 2>/dev/null |
+    /usr/bin/awk '$NF == "(ED25519)" { print $2 }') || fingerprints=''
+
+if printf '%s\n' "$fingerprints" | /usr/bin/grep -Fxq "$expected"; then
+    host=$lan
+    route=LAN
+else
+    host=$tailnet
+    route=Tailscale
+fi
+
+# Only the TCP relay writes to stdout. -G bounds connect time, not idle time.
+printf 'devserver: %s (%s)\n' "$route" "$host" >&2
+exec /usr/bin/nc -n -G 2 "$host" 22

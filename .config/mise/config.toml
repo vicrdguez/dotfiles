@@ -54,6 +54,8 @@ press_and_hold = false
 "~/.config/ghostty" = {}
 "~/.config/zellij" = {}
 "~/.config/herdr" = { mode = "symlink-each"}
+"~/.local/bin/devserver-ssh-connect" = { mode = "copy" }
+"~/.ssh/config.d/devserver.conf" = { mode = "copy" }
 "~/.config/wezterm" = {}
 "~/.pi/agent/settings.json" = {}
 "~/.pi/agent/prompts" = { mode = "symlink-each" }
